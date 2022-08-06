@@ -1,0 +1,164 @@
+{
+  "version": "0.1.0",
+  "name": "devent",
+  "instructions": [
+    {
+      "name": "createState",
+      "docs": [
+        "Initializes the state of the program.",
+        "This function must be called before any event is created.",
+        "It declares a variable used to create an event."
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "createEvent",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "event",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "System program"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "metadataUrl",
+          "type": "string"
+        },
+        {
+          "name": "maxAttendees",
+          "type": "u64"
+        },
+        {
+          "name": "minPrice",
+          "type": "u64"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "StateAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "eventCount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "EventAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "index",
+            "type": "u64"
+          },
+          {
+            "name": "metadataUrl",
+            "type": "string"
+          },
+          {
+            "name": "registrationLimit",
+            "type": "u64"
+          },
+          {
+            "name": "amountRegistered",
+            "type": "u64"
+          },
+          {
+            "name": "minLamports",
+            "type": "u64"
+          },
+          {
+            "name": "attendees",
+            "type": {
+              "defined": "HashMap<Pubkey,Status>"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "Status",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NotRegistered"
+          },
+          {
+            "name": "Registered"
+          },
+          {
+            "name": "AttendanceVerified"
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "MaxCapacity",
+      "msg": "Event at maximum capacity"
+    },
+    {
+      "code": 6001,
+      "name": "InvalidUrl",
+      "msg": "Metadata URL is too long"
+    }
+  ],
+  "metadata": {
+    "address": "59sCeP718NpdHv3Xj6kjgrmGNEt67BNXFcy5VUBUDhJE"
+  }
+}
