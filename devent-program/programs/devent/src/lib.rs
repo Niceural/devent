@@ -63,7 +63,7 @@ pub mod devent {
         ctx: Context<AttendeeRegisters>,
     ) -> Result<()> {
         let event = &mut ctx.accounts.event;
-        if event.registration_count > event.registration_limit {
+        if event.registration_count >= event.registration_limit {
             return Err(ErrorCode::MaxCapacity.into())
         }
 

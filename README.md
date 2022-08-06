@@ -29,8 +29,8 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/Niceural/devent">
-    <img src="images/solana-hackathon.svg" alt="Logo" width="120">
+  <a href="https://solana.com/summercamp">
+    <img src="images/solana-hackathon.svg" alt="Logo" width="400">
   </a>
 
 <h3 align="center">devent</h3>
@@ -79,22 +79,27 @@
 
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
+<!-- screenshots -->
 
-Here's a blank template to get started: To avoid retyping too much info. Do a search and replace with your text editor for the following: `Niceural`, `devent`, `Niceural`, `nicolas-bayle-558a21200`, `imperial`, `nicolas.bayle20`, `devent`, `A decentralized event management and ticketing application`
+This project consists in a decentralized application where users can create events, register to events, and more. It can be considered as a dummy web3 implementation of [eventbrite](https://www.eventbrite.co.uk/). The program (or smart contract) is deployed on [Solana](https://solana.com/) blockchain. It has been submitted for examination by the [Solana Summer Camp Hackathon](https://solana.com/summercamp) judges. This project implements the following features:
+
+- an organizer can create a new event (with metadata stored off chain and arbitrary ticket price),
+- a wallet can register to an event (and pay in SOL if not free),
+- a wallet can confirm attendance to an event,
+- a wallet can receive an NFT on registration and/or attendance to the event,
+- an organizer can choose to allow a wallet to resell its ticket and set a maximum resell price,
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Built With
 
-- [![Next][next.js]][next-url]
-- [![React][react.js]][react-url]
-- [![Vue][vue.js]][vue-url]
-- [![Angular][angular.io]][angular-url]
-- [![Svelte][svelte.dev]][svelte-url]
-- [![Laravel][laravel.com]][laravel-url]
-- [![Bootstrap][bootstrap.com]][bootstrap-url]
-- [![JQuery][jquery.com]][jquery-url]
+- [Next.js](https://nextjs.org/)
+- [React](https://reactjs.org/)
+- [IPFS](https://ipfs.tech/)
+- [Pinata](https://www.pinata.cloud/)
+- [Tailwindcss](https://tailwindcss.com/)
+- [Anchor](https://www.anchor-lang.com/)
+- [Solana](https://solana.com/)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -102,32 +107,32 @@ Here's a blank template to get started: To avoid retyping too much info. Do a se
 
 ## Getting Started
 
-This is an example of how you may give instructions on setting up your project locally.
-To get a local copy up and running follow these simple example steps.
+In this section we will discuss how to setup and run this project's frontend locally.
 
 ### Prerequisites
 
-This is an example of how to list things you need to use the software and how to install them.
+Project prerequisites and links to how to install them:
 
-- npm
-  ```sh
-  npm install npm@latest -g
-  ```
+- [Node.js](https://nodejs.org/en/download/)
+- [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
+- [yarn](https://classic.yarnpkg.com/en/docs/install#debian-stable)
+- [git](https://git-scm.com/downloads)
 
 ### Installation
 
-1. Get a free API Key at [https://example.com](https://example.com)
-2. Clone the repo
+1. Clone the repo
    ```sh
    git clone https://github.com/Niceural/devent.git
+   cd devent/devent-frontend/
    ```
-3. Install NPM packages
+2. Install NPM packages
    ```sh
-   npm install
+   yarn
    ```
-4. Enter your API in `config.js`
-   ```js
-   const API_KEY = "ENTER YOUR API";
+3. Create an account and create a new Pinata API key at [this](https://app.pinata.cloud/keys) link
+4. Create a [.env](./devent-frontend/.env) file and enter your API and API secret keys following [.env.example](./devent-frontend/.env.example) template:
+   ```sh
+   touch .env
    ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -136,9 +141,11 @@ This is an example of how to list things you need to use the software and how to
 
 ## Usage
 
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
+### Create a new event
 
-_For more examples, please refer to the [Documentation](https://example.com)_
+### Show all events
+
+### Register for an event
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -239,20 +246,3 @@ Project Link: [https://github.com/Niceural/devent](https://github.com/Niceural/d
 [license-url]: https://github.com/Niceural/devent/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/nicolas-bayle-558a21200
-[product-screenshot]: images/screenshot.png
-[next.js]: https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white
-[next-url]: https://nextjs.org/
-[react.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
-[react-url]: https://reactjs.org/
-[vue.js]: https://img.shields.io/badge/Vue.js-35495E?style=for-the-badge&logo=vuedotjs&logoColor=4FC08D
-[vue-url]: https://vuejs.org/
-[angular.io]: https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white
-[angular-url]: https://angular.io/
-[svelte.dev]: https://img.shields.io/badge/Svelte-4A4A55?style=for-the-badge&logo=svelte&logoColor=FF3E00
-[svelte-url]: https://svelte.dev/
-[laravel.com]: https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white
-[laravel-url]: https://laravel.com
-[bootstrap.com]: https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white
-[bootstrap-url]: https://getbootstrap.com
-[jquery.com]: https://img.shields.io/badge/jQuery-0769AD?style=for-the-badge&logo=jquery&logoColor=white
-[jquery-url]: https://jquery.com
