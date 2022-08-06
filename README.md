@@ -30,18 +30,18 @@
 <br />
 <div align="center">
   <a href="https://github.com/Niceural/devent">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
+    <img src="images/solana-hackathon.svg" alt="Logo" width="120">
   </a>
 
 <h3 align="center">devent</h3>
 
   <p align="center">
     A decentralized event management and ticketing application
-    <br />
+    <!-- <br />
     <a href="https://github.com/Niceural/devent"><strong>Explore the docs »</strong></a>
+    <br /> -->
     <br />
-    <br />
-    <a href="https://github.com/Niceural/devent">View Demo</a>
+    <a href="https://youtube.com/">View Demo</a>
     ·
     <a href="https://github.com/Niceural/devent/issues">Report Bug</a>
     ·
@@ -81,7 +81,7 @@
 
 [![Product Name Screen Shot][product-screenshot]](https://example.com)
 
-Here's a blank template to get started: To avoid retyping too much info. Do a search and replace with your text editor for the following: `Niceural`, `devent`, `Niceural`, `linkedin_username`, `imperial`, `nicolas.bayle20`, `devent`, `A decentralized event management and ticketing application`
+Here's a blank template to get started: To avoid retyping too much info. Do a search and replace with your text editor for the following: `Niceural`, `devent`, `Niceural`, `nicolas-bayle-558a21200`, `imperial`, `nicolas.bayle20`, `devent`, `A decentralized event management and ticketing application`
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -146,10 +146,34 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 
 ## Roadmap
 
-- [ ] Feature 1
-- [ ] Feature 2
-- [ ] Feature 3
-  - [ ] Nested Feature
+- [ ] README
+- [ ] youtube presentation video
+- [ ] program
+  - [ ] integration tests
+    - [ ] create a new event with off chain metadata
+    - [ ] get all events
+    - [ ] register to an event
+  - [ ] unit tests
+    - [ ] create state
+    - [x] state
+    - [x] create event with metadata off chain
+    - [ ] create event with metadata on chain
+    - [ ] attendee registers and transfer lamports
+    - [ ] mint nft on registration
+    - [ ] confirm attendance
+    - [ ] mint nft on attendance registration
+    - [ ] resell ticket with fixed price
+    - [ ] resell ticket with custom price
+- [ ] frontend
+  - [ ] home page
+  - [ ] create a new event page
+    - [ ] store file image with pinata
+    - [ ] store metadata with pinata
+    - [ ] store file image with nft.storage
+    - [ ] store metadata with nft.storage
+    - [ ] store metadata on chain
+  - [ ] all events page
+  - [ ] register for event page
 
 See the [open issues](https://github.com/Niceural/devent/issues) for a full list of proposed features (and known issues).
 
@@ -214,7 +238,7 @@ Project Link: [https://github.com/Niceural/devent](https://github.com/Niceural/d
 [license-shield]: https://img.shields.io/github/license/Niceural/devent.svg?style=for-the-badge
 [license-url]: https://github.com/Niceural/devent/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
-[linkedin-url]: https://linkedin.com/in/linkedin_username
+[linkedin-url]: https://linkedin.com/in/nicolas-bayle-558a21200
 [product-screenshot]: images/screenshot.png
 [next.js]: https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white
 [next-url]: https://nextjs.org/
