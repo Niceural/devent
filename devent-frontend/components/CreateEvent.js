@@ -4,15 +4,10 @@ import * as anchor from "@project-serum/anchor";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { SOLANA_HOST } from "../utils/const";
 import { getProgramInstance } from "../utils/get-program";
+import { TOKEN_PROGRAM_ID } from "@project-serum/anchor/dist/cjs/utils/token";
 import FormData from "form-data";
 import axios from "axios";
 import { DEBUG_LOG as log } from "../utils/const";
-// import pinataSDK from "@pinata/sdk";
-// import fs from "fs";
-
-// const pinataApiKey = process.env.PINATA_API_KEY || "";
-// const pinataApiSecret = process.env.PINATA_API_SECRET || "";
-// const pinata = pinataSDK(pinataApiKey, pinataApiSecret);
 
 const CreateEvent = ({
   setOnChainEventAddress,
@@ -43,6 +38,11 @@ const CreateEvent = ({
   );
   const [minLamportsPrice, setMinLamportsPrice] = useState(new anchor.BN("0"));
 
+  const defaultAccounts = {
+    tokenProgram: TOKEN_PROGRAM_ID,
+    systemProgram: anchor.web3.SystemProgram.programId,
+  };
+
   const handleSubmit = async (event) => {
     console.log("Creating a new event...");
     event.preventDefault();
@@ -53,6 +53,7 @@ const CreateEvent = ({
   };
 
   const saveFileToPinata = async () => {
+    /*
     console.log("Saving image to Pinata...");
     try {
       if (image) {
@@ -82,6 +83,7 @@ const CreateEvent = ({
     } catch (error) {
       console.log(error);
     }
+    */
     setImageUrl(
       "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F319134359%2F26253177781%2F1%2Foriginal.20220715-122927?w=800&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C25%2C768%2C384&s=810957612ec7d2eb9cc5eae100b7f1ac"
     );
@@ -134,7 +136,7 @@ const CreateEvent = ({
     console.log("\tdone.");
     */
     setOffChainMetadataUrl(
-      "https://gateway.pinata.cloud/ipfs/QmZnffHm373A9A77Dcxq2JPrRQQRGbvWPCjywSF3BoTwwy"
+      "https://raw.githubusercontent.com/Niceural/devent/main/devent-program/tests/event1.json"
     );
     setSuccessOffChain(true);
   };
@@ -148,53 +150,29 @@ const CreateEvent = ({
     const connection = new anchor.web3.Connection(SOLANA_HOST);
     const program = getProgramInstance(connection, wallet);
 
-    console.log("Getting state signer...");
-    let [stateSigner] = await anchor.web3.PublicKey.findProgramAddress(
+    let [statePda] = await anchor.web3.PublicKey.findProgramAddress(
       [anchor.utils.bytes.utf8.encode("state")],
       program.programId
     );
-    console.log(`State signer: ${stateSigner}`);
-    let stateInfo;
-    try {
-      console.log("Getting state info...");
-      stateInfo = await program.account.fetch(stateSigner);
-    } catch (error) {
-      console.log(error);
-      console.log("State has not been created. Creating state...");
-      await program.methods
-        .createState()
-        .accounts({ state: stateSigner, authority: wallet.publicKey })
-        .signers([stateSigner])
-        .rpc();
-      // setSuccessOnChain(false);
-      // return;
-    }
+    const stateData = await program.accounts.stateAccount.fetch(statePda);
 
-    console.log("Getting event signer...");
-    let [eventSigner] = await anchor.web3.PublicKey.findProgramAddress(
+    const [eventPda] = await anchor.web3.PublicKey.findProgramAddress(
       [
         anchor.utils.bytes.utf8.encode("event"),
-        stateInfo.eventCount.toArrayLike(Buffer, "be", 8),
+        stateData.eventCount.toArrayLike(Buffer, "be", 8),
       ],
       program.programId
     );
-    console.log(`Event signer: ${eventSigner}`);
-    try {
-      console.log("Fetching EventAccount...");
-      await program.account.eventAccount.fetch(eventSigner);
-    } catch (error) {
-      console.log("No EventAccount found. Creating event account...");
-      console.log(error);
-      await program.methods
-        .createEvent(offChainMetadataUrl, registrationLimit, minLamportsPrice)
-        .accounts({
-          state: stateSigner,
-          event: eventSigner,
-          authority: wallet.publicKey,
-        })
-        .signers([eventSigner])
-        .rpc();
-    }
+
+    const tx = await program.methods
+      .createEvent(offChainMetadataUrl, registrationLimit, minLamportsPrice)
+      .accounts({
+        state: statePda,
+        event: eventPda,
+        authority: wallet.publicKey,
+        ...defaultAccounts,
+      })
+      .rpc();
 
     setOnChainEventAddress(eventSigner);
     setSuccessOnChain(true);
