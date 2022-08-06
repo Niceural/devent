@@ -1,3 +1,6 @@
+//! # devent
+//! A decentralized event management and ticketing application.
+
 use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Token};
 use std::mem::size_of;
@@ -12,38 +15,45 @@ pub mod devent {
 
     /// Initializes the state of the program. 
     /// This function must be called before any event is created.
-    /// It declares a variable used to create an event.
+    /// It is used to give an event index different for each index.
+    /// An event will then be referenced to with this index.
     pub fn create_state(
         ctx: Context<CreateState>,
     ) -> Result<()> {
         let state = &mut ctx.accounts.state;
         state.authority = ctx.accounts.authority.key();
-        state.event_count = 0;
+        state.event_count = 0; // used to assign to EventAccount.index
         Ok(())
     }
 
+    /// Creates a new event.
+    /// @param metadata_url URL pointing to the metadata of the event.
+    /// @param registration_limit Maximum number of Pubkeys allowed to register.
+    /// @param min_lamports_price Minimum ticket price in lamports. 
     pub fn create_event(
         ctx: Context<CreateEvent>,
         metadata_url: String,
-        max_attendees: u64,
-        min_price: u64,
+        registration_limit: u64,
+        min_lamports_price: u64,
     ) -> Result<()> {
+        // throws an exception if metadata_url contains over 255 characters
         if METADATA_URL_LENGTH < metadata_url.len() {
             return Err(ErrorCode::InvalidUrl.into());
         }
-
         // get state
         let state = &mut ctx.accounts.state;
         // get event
         let event = &mut ctx.accounts.event;
+        // assign and increment event index
+        event.index = state.event_count;
+        state.event_count += 1; // increments variable used for event index
+        // assign values to event
         event.authority = ctx.accounts.authority.key();
         event.metadata_url = metadata_url;
-        event.registration_limit = max_attendees;
-        event.amount_registered = 0;
-        event.min_lamports_price = min_price;
-        event.index = state.event_count;
+        event.registration_limit = registration_limit;
+        event.registration_count = 0;
+        event.min_lamports_price = min_lamports_price;
 
-        state.event_count += 1;
         Ok(())
     }
 
@@ -51,16 +61,16 @@ pub mod devent {
         ctx: Context<AttendeeRegisters>,
     ) -> Result<()> {
         let event = &mut ctx.accounts.event;
-        if event.amount_registered > event.registration_limit {
+        if event.registration_count > event.registration_limit {
             return Err(ErrorCode::MaxCapacity.into())
         }
 
         let registration = &mut ctx.accounts.registration;
         registration.authority = ctx.accounts.authority.key();
         registration.status = Status::Registered;
-        registration.index = event.amount_registered;
+        registration.index = event.registration_count;
 
-        event.amount_registered += 1;
+        event.registration_count += 1;
         Ok(())
     }
 }
@@ -95,7 +105,6 @@ pub struct CreateEvent<'info> {
         bump,
     )]
     pub state: Account<'info, StateAccount>,
-
     // authenticate event account
     #[account(
         init,
@@ -125,7 +134,7 @@ pub struct AttendeeRegisters<'info> {
 
     #[account(
         init,
-        seeds = [b"registration".as_ref(), event.index.to_be_bytes().as_ref(), event.amount_registered.to_be_bytes().as_ref()],
+        seeds = [b"registration".as_ref(), event.index.to_be_bytes().as_ref(), event.registration_count.to_be_bytes().as_ref()],
         bump,
         payer = authority,
         space = RegistrationAccount::LEN,
@@ -160,7 +169,7 @@ pub struct EventAccount {
     pub index: u64, // given by the StateAccount
     pub metadata_url: String, // event metadata url
     pub registration_limit: u64, // maximum number of Pubkeys allowed to register
-    pub amount_registered: u64, // amount of Pubkeys currently registered
+    pub registration_count: u64, // amount of Pubkeys currently registered
     pub min_lamports_price: u64, // minimum registration price in lamports
 }
 
