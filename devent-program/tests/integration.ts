@@ -2,8 +2,6 @@ import * as anchor from "@project-serum/anchor";
 import { assert } from "chai";
 import { Devent } from "../target/types/devent";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import { AccountClient } from "@project-serum/anchor";
-import { BN } from "bn.js";
 
 describe("devent integration tests", () => {
   const provider = anchor.AnchorProvider.env();

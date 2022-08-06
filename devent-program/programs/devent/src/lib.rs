@@ -2,11 +2,13 @@
 //! A decentralized event management and ticketing application.
 
 use anchor_lang::prelude::*;
+use anchor_lang::system_program;
 use anchor_spl::token::{self, Token};
 use std::mem::size_of;
 
 declare_id!("59sCeP718NpdHv3Xj6kjgrmGNEt67BNXFcy5VUBUDhJE");
 
+// max metadata url length
 const METADATA_URL_LENGTH: usize = 255;
 
 #[program]
@@ -14,8 +16,8 @@ pub mod devent {
     use super::*;
 
     /// Initializes the state of the program. 
-    /// This function must be called before any event is created.
-    /// It is used to give an event index different for each index.
+    /// The program state must be created before any event is created.
+    /// It is used to give an event index different for each event.
     /// An event will then be referenced to with this index.
     pub fn create_state(
         ctx: Context<CreateState>,
@@ -27,7 +29,7 @@ pub mod devent {
     }
 
     /// Creates a new event.
-    /// @param metadata_url URL pointing to the metadata of the event.
+    /// @param metadata_url URL pointing to the event metadata.
     /// @param registration_limit Maximum number of Pubkeys allowed to register.
     /// @param min_lamports_price Minimum ticket price in lamports. 
     pub fn create_event(
@@ -36,7 +38,7 @@ pub mod devent {
         registration_limit: u64,
         min_lamports_price: u64,
     ) -> Result<()> {
-        // throws an exception if metadata_url contains over 255 characters
+        // throws an exception if size of metadata_url is larger than 255 bytes
         if METADATA_URL_LENGTH < metadata_url.len() {
             return Err(ErrorCode::InvalidUrl.into());
         }
@@ -64,6 +66,17 @@ pub mod devent {
         if event.registration_count > event.registration_limit {
             return Err(ErrorCode::MaxCapacity.into())
         }
+
+        system_program::transfer(
+            CpiContext::new(
+                ctx.accounts.system_program.to_account_info(),
+                system_program::Transfer {
+                    from: ctx.accounts.authority.to_account_info(),
+                    to: ctx.accounts.organizer.to_account_info(),
+                }
+            ),
+            event.min_lamports_price,
+        )?;
 
         let registration = &mut ctx.accounts.registration;
         registration.authority = ctx.accounts.authority.key();
@@ -145,6 +158,10 @@ pub struct AttendeeRegisters<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
 
+    // event organizer who created the event
+    #[account(constraint = organizer.key == &event.authority)]
+    pub organizer: Signer<'info>,
+
     /// CHECK: System program
     pub system_program: UncheckedAccount<'info>,
 
@@ -156,11 +173,12 @@ pub struct AttendeeRegisters<'info> {
 #[account]
 pub struct StateAccount {
     pub authority: Pubkey, // signer address
-    pub event_count: u64, // number of events
+    pub event_count: u64, // use to assign to EventAccount.index
 }
 
 impl StateAccount {
-    const LEN: usize = 32 + 64;
+    // size of StateAccount in bytes
+    const LEN: usize = 32 + 8;
 }
 
 #[account]
