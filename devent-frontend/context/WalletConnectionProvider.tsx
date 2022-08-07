@@ -1,14 +1,18 @@
+import React, { useMemo, ReactNode } from "react";
 import {
   ConnectionProvider,
   WalletProvider,
 } from "@solana/wallet-adapter-react";
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
-import { useMemo } from "react";
+import { SOLANA_HOST } from "../utils/const";
 
-const WalletConnectionProvider = ({ children }) => {
-  const endpoint = useMemo(() => "https://api.devnet.solana.com", []);
+type WalletProps = {
+  children: ReactNode;
+};
 
+export default function WalletConnectionProvider({ children }: WalletProps) {
+  const endpoint = useMemo(() => SOLANA_HOST, []);
   const wallets = useMemo(() => [new PhantomWalletAdapter()], []);
 
   return (
@@ -18,6 +22,4 @@ const WalletConnectionProvider = ({ children }) => {
       </WalletProvider>
     </ConnectionProvider>
   );
-};
-
-export default WalletConnectionProvider;
+}

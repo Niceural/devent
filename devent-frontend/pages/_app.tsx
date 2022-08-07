@@ -1,7 +1,7 @@
 import "../styles/globals.css";
-import dynamic from "next/dynamic";
+import type { AppProps } from "next/app";
 import Head from "next/head";
-// import { WalletBalanceProvider } from "../context/useWalletBalance";
+import dynamic from "next/dynamic";
 import { ModalProvider } from "react-simple-hook-modal";
 import Header from "../components/Header";
 
@@ -10,22 +10,22 @@ const WalletConnectionProvider = dynamic(
   { ssr: false }
 );
 
-function MyApp({ Component, pageProps }) {
-  const style = { appWrapper: "bg-slate-900 text-amber-600" };
+function MyApp({ Component, pageProps }: AppProps) {
+  const style = {
+    wrapper: "",
+  };
 
   return (
-    <div className={style.appWrapper}>
+    <div className={style.wrapper}>
       <Head>
         <title>devent</title>
         <meta name="description" content="devent" />
       </Head>
       <WalletConnectionProvider>
-        {/* <WalletBalanceProvider> */}
         <ModalProvider>
           <Header />
           <Component {...pageProps} />
         </ModalProvider>
-        {/* </WalletBalanceProvider> */}
       </WalletConnectionProvider>
     </div>
   );

@@ -30,7 +30,7 @@
 <br />
 <div align="center">
   <a href="https://solana.com/summercamp">
-    <img src="images/solana-hackathon.svg" alt="Logo" width="400">
+    <img src="images/solana-hackathon.svg" alt="Logo" width="500">
   </a>
 
 <h3 align="center">devent</h3>
@@ -81,7 +81,7 @@
 
 <!-- screenshots -->
 
-This project consists in a decentralized application where users can create events, register to events, and more. It can be considered as a dummy web3 implementation of [eventbrite](https://www.eventbrite.co.uk/). The program (or smart contract) is deployed on [Solana](https://solana.com/) blockchain. It has been submitted for examination by the [Solana Summer Camp Hackathon](https://solana.com/summercamp) judges. This project implements the following features:
+This project consists in a decentralized application where users can create events, register to events, and more. It can be considered as a dummy web3 implementation of [eventbrite](https://www.eventbrite.co.uk/). The program (or smart contract) is deployed on [Solana](https://solana.com/) devnet. It has been submitted for examination by the [Solana Summer Camp Hackathon](https://solana.com/summercamp) judges. This project implements the following features:
 
 - an organizer can create a new event (with metadata stored off chain and arbitrary ticket price),
 - a wallet can register to an event (and pay in SOL if not free),
@@ -207,7 +207,7 @@ Don't forget to give the project a star! Thanks again!
 
 ## License
 
-Distributed under the MIT License. See `LICENSE.txt` for more information.
+Distributed under the MIT License. See [LICENSE.txt](./LICENSE.txt) for more information.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

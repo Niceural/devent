@@ -1,7 +1,6 @@
 import { clusterApiUrl, PublicKey } from "@solana/web3.js";
-import devent from "./devent.json";
-
-export const DEBUG_LOG = true;
+import devent from "../../devent-program/target/idl/devent.json";
+import { Idl } from "@project-serum/anchor";
 
 export const CLUSTER =
   process.env.REACT_APP_CLUSTER === "mainnet"
