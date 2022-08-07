@@ -1,7 +1,15 @@
-import React, { Component } from "react";
+import React, { FunctionComponent } from "react";
 
-export default class Event extends Component {
-  render() {
-    return <div>Event</div>;
-  }
-}
+type EventProps = {
+  eventData: any;
+};
+
+const Event: FunctionComponent<EventProps> = ({ eventData }) => {
+  const style = {
+    wrapper: "",
+  };
+
+  return <div className={style.wrapper}>Event:</div>;
+};
+
+export default Event;

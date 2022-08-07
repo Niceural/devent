@@ -9,13 +9,13 @@ const utf8 = anchor.utils.bytes.utf8;
 type CreateEventProps = {
   setOnChainSuccess: React.Dispatch<React.SetStateAction<boolean>>;
   setOffChainSuccess: React.Dispatch<React.SetStateAction<boolean>>;
-  setEventIndex: React.Dispatch<React.SetStateAction<anchor.BN>>;
+  setEventData: any;
 };
 
 const CreateEvent: FunctionComponent<CreateEventProps> = ({
   setOnChainSuccess,
   setOffChainSuccess,
-  setEventIndex,
+  setEventData,
 }) => {
   // component styling
   const style = {
@@ -23,7 +23,7 @@ const CreateEvent: FunctionComponent<CreateEventProps> = ({
   };
 
   // states
-  const wallet = useWallet;
+  const wallet = useWallet();
   // off chain data
   const [title, setTitle] = useState("");
   const [organizer, setOrganizer] = useState("");
@@ -47,13 +47,13 @@ const CreateEvent: FunctionComponent<CreateEventProps> = ({
     systemProgram: anchor.web3.SystemProgram.programId,
   };
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: any) => {
     event.preventDefault();
     console.log("Creating a new event...");
     await saveFileToPinata();
     await saveMetadataToPinata();
     await createOnchainEvent();
-    console.log(`New event created with index: ${0}`);
+    console.log("done.");
   };
 
   const saveFileToPinata = async () => {};
@@ -88,16 +88,122 @@ const CreateEvent: FunctionComponent<CreateEventProps> = ({
       .accounts({
         state: statePda,
         event: eventPda,
-        authority: wallet.publicKey,
+        authority: wallet.publicKey as anchor.Address,
         ...defaultAccounts,
       })
       .rpc();
 
-    setEventIndex(stateData.eventCount);
+    const eventData = await program.account.eventAccount.fetch(eventPda);
+    setEventData(eventData);
     setOnChainSuccess(true);
   };
 
-  return <div className={style.wrapper}>Create a new Event</div>;
+  return (
+    <div className={style.wrapper}>
+      Create a new Event:
+      <form className={style.form}>
+        Title
+        <input
+          value={title}
+          onChange={(event) => setTitle(event.target.value)}
+          className={style.formInput}
+          placeholder={"Title"}
+        />
+        Organizer
+        <input
+          value={organizer}
+          onChange={(event) => setOrganizer(event.target.value)}
+          className={style.formInput}
+          placeholder={"Organizer"}
+        />
+        Description
+        <input
+          value={description}
+          onChange={(event) => setDescription(event.target.value)}
+          className={style.formInput}
+          placeholder={"Description"}
+        />
+        Image
+        <input
+          type="file"
+          // value={image}
+          onChange={(event) => {
+            setImage(event.target.files[0]);
+            // const file = event.target.files[0];
+            // if (file) {
+            //   const data = new FormData();
+            //   data.append("file", file);
+            //   setImage(data);
+            // }
+          }}
+          className={style.formInput}
+          placeholder={"Event image"}
+        />
+        Location
+        <input
+          value={location}
+          onChange={(event) => setLocation(event.target.value)}
+          className={style.formInput}
+          placeholder={"Location"}
+        />
+        Start Date
+        <input
+          value={startDate}
+          onChange={(event) => setStartDate(event.target.value)}
+          className={style.formInput}
+          placeholder={"Start date"}
+        />
+        Start Time
+        <input
+          value={startTime}
+          onChange={(event) => setStartTime(event.target.value)}
+          className={style.formInput}
+          placeholder={"Start time"}
+        />
+        End Date
+        <input
+          value={endDate}
+          onChange={(event) => setEndDate(event.target.value)}
+          className={style.formInput}
+          placeholder={"End date"}
+        />
+        End time
+        <input
+          value={endTime}
+          onChange={(event) => setEndTime(event.target.value)}
+          className={style.formInput}
+          placeholder={"End time"}
+        />
+        Registration Limit
+        <input
+          value={registrationLimit.toString()}
+          onChange={(event) => {
+            setRegistrationLimit(new anchor.BN(event.target.value));
+          }}
+          className={style.formInput}
+          placeholder={"Maximum number of people allowed to register"}
+        />
+        Price in lamports
+        <input
+          value={minLamportsPrice
+            // .div(anchor.web3.LAMPORTS_PER_SOL)
+            .toString()}
+          onChange={(event) => {
+            const val = new anchor.BN(event.target.value);
+            setMinLamportsPrice(val); // .mul(anchor.web3.LAMPORTS_PER_SOL));
+          }}
+          className={style.formInput}
+          placeholder={"Minimum price in lamports"}
+        />
+        <button
+          className={style.submitButton}
+          type="submit"
+          onClick={handleSubmit}
+          value="Create"
+        />
+      </form>
+    </div>
+  );
 };
 
 export default CreateEvent;

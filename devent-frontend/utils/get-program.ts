@@ -1,11 +1,10 @@
 import * as anchor from "@project-serum/anchor";
 import { WalletNotConnectedError } from "@solana/wallet-adapter-base";
-import { WalletContextState } from "@solana/wallet-adapter-react";
-import { STABLE_POOL_IDL, STABLE_POOL_PROGRAM_ID } from "./const";
+import { PROGRAM_IDL, PROGRAM_ID } from "./const";
 
 export default function getProgramInstance(
   connection: anchor.web3.Connection,
-  wallet: anchor.Wallet
+  wallet: any
 ) {
   console.log("Getting program instance...");
   if (!wallet.publicKey) throw new WalletNotConnectedError();
@@ -16,11 +15,7 @@ export default function getProgramInstance(
     anchor.AnchorProvider.defaultOptions()
   );
 
-  const program = new anchor.Program(
-    STABLE_POOL_IDL,
-    STABLE_POOL_PROGRAM_ID,
-    provider
-  );
+  const program = new anchor.Program(PROGRAM_IDL, PROGRAM_ID, provider);
 
   return program;
 }

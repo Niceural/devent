@@ -12,7 +12,7 @@ const WalletConnectionProvider = dynamic(
 
 function MyApp({ Component, pageProps }: AppProps) {
   const style = {
-    wrapper: "",
+    wrapper: "bg-black",
   };
 
   return (

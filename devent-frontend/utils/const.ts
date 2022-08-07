@@ -1,6 +1,6 @@
 import { clusterApiUrl, PublicKey } from "@solana/web3.js";
+import { Devent } from "../../devent-program/target/types/devent";
 import devent from "../../devent-program/target/idl/devent.json";
-import { Idl } from "@project-serum/anchor";
 
 export const CLUSTER =
   process.env.REACT_APP_CLUSTER === "mainnet"
@@ -17,8 +17,8 @@ export const SOLANA_HOST = process.env.REACT_APP_SOLANA_API_URL
   ? clusterApiUrl("devnet")
   : "https://api.devnet.solana.com";
 
-export const STABLE_POOL_PROGRAM_ID = new PublicKey(
+export const PROGRAM_ID = new PublicKey(
   "59sCeP718NpdHv3Xj6kjgrmGNEt67BNXFcy5VUBUDhJE"
 );
 
-export const STABLE_POOL_IDL = devent;
+export const PROGRAM_IDL = devent as Devent;
