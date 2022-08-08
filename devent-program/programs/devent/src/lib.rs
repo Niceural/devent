@@ -10,10 +10,14 @@ declare_id!("59sCeP718NpdHv3Xj6kjgrmGNEt67BNXFcy5VUBUDhJE");
 
 pub mod state;
 pub mod event;
+pub mod registration;
 pub mod error;
+pub mod mint_nft;
 use state::*;
 use event::*;
+use registration::*;
 use error::*;
+use mint_nft::*;
 
 #[program]
 pub mod devent {

@@ -66,7 +66,12 @@
         <li><a href="#installation">Installation</a></li>
       </ul>
     </li>
-    <li><a href="#usage">Usage</a></li>
+    <li><a href="#usage">Usage</a>
+      <ul>
+        <li><a href="#create-a-new-event">Create a new event</a></li>
+        <li><a href="#register-for-an-event">Register for an event</a></li>
+      </ul> 
+    </li>
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
@@ -83,10 +88,10 @@
 
 This project consists in a decentralized application where users can create events, register to events, and more. It can be considered as a dummy web3 implementation of [eventbrite](https://www.eventbrite.co.uk/). The program (or smart contract) is deployed on [Solana](https://solana.com/) devnet. It has been submitted for examination by the [Solana Summer Camp Hackathon](https://solana.com/summercamp) judges. This project implements the following features:
 
-- an organizer can create a new event (with metadata stored off chain and arbitrary ticket price),
-- a wallet can register to an event (and pay in SOL if not free),
+- an organizer can create a new event,
+- a wallet can register to an event (and pay in SOL if the ticket is not free),
 - a wallet can confirm attendance to an event,
-- a wallet can receive an NFT on registration and/or attendance to the event,
+- a wallet can receive an NFT on registration and/or on attendance to the event,
 - an organizer can choose to allow a wallet to resell its ticket and set a maximum resell price,
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -145,8 +150,6 @@ Project prerequisites and links to how to install them:
 
 ### Create a new event
 
-### Show all events
-
 ### Register for an event
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -158,21 +161,9 @@ Project prerequisites and links to how to install them:
 - [ ] README
 - [ ] youtube presentation video
 - [ ] program
-  - [ ] integration tests
-    - [ ] create a new event with off chain metadata
-    - [ ] get all events
-    - [ ] register to an event
-  - [ ] unit tests
-    - [ ] create state
-    - [x] state
-    - [x] create event with metadata off chain
-    - [ ] create event with metadata on chain
-    - [ ] attendee registers and transfer lamports
-    - [ ] mint nft on registration
-    - [ ] confirm attendance
-    - [ ] mint nft on attendance registration
-    - [ ] resell ticket with fixed price
-    - [ ] resell ticket with custom price
+  - [ ] create state
+  - [ ] create event
+  - [ ] register to event
 - [ ] frontend
   - [ ] home page
   - [ ] create a new event page
@@ -217,7 +208,7 @@ Distributed under the MIT License. See [LICENSE.txt](./LICENSE.txt) for more inf
 
 ## Contact
 
-Your Name - [@Niceural](https://twitter.com/Niceural) - nicolas.bayle20@imperial.ac.uk
+Nicolas Bayle - [@Niceural](https://twitter.com/Niceural) - nicolas.bayle20@imperial.ac.uk
 
 Project Link: [https://github.com/Niceural/devent](https://github.com/Niceural/devent)
 
@@ -227,9 +218,9 @@ Project Link: [https://github.com/Niceural/devent](https://github.com/Niceural/d
 
 ## Acknowledgments
 
-- []()
-- []()
-- []()
+- [Build Facebook 3.0 on Blockchain with Solana | Next.js | Netlify | Sanity.io](https://youtu.be/8v5lFscLPRY)
+- [Build TikTok Web 3.0 Blockchain App with Solana | Rust | Next.js | Netlify](https://youtu.be/qIGs3XWybgU)
+- [Coding & Crypto](https://www.youtube.com/c/CodingCrypto)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
