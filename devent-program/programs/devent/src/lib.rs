@@ -8,8 +8,12 @@ use std::mem::size_of;
 
 declare_id!("59sCeP718NpdHv3Xj6kjgrmGNEt67BNXFcy5VUBUDhJE");
 
-// max metadata url length
-const METADATA_URL_LENGTH: usize = 255;
+pub mod state;
+pub mod event;
+pub mod error;
+use state::*;
+use event::*;
+use error::*;
 
 #[program]
 pub mod devent {
@@ -17,206 +21,30 @@ pub mod devent {
 
     /// Initializes the state of the program. 
     /// The program state must be created before any event is created.
-    /// It is used to give an event index different for each event.
-    /// An event will then be referenced to with this index.
+    /// It is used to give a unique event index for each event.
+    /// An event will then be referenced to using this index.
     pub fn create_state(
         ctx: Context<CreateState>,
     ) -> Result<()> {
-        let state = &mut ctx.accounts.state;
-        state.authority = ctx.accounts.authority.key();
-        state.event_count = 0; // used to assign to EventAccount.index
-        Ok(())
+        state::create_state(ctx)
     }
 
     /// Creates a new event.
-    /// @param metadata_url URL pointing to the event metadata.
-    /// @param registration_limit Maximum number of Pubkeys allowed to register.
-    /// @param min_lamports_price Minimum ticket price in lamports. 
     pub fn create_event(
         ctx: Context<CreateEvent>,
-        metadata_url: String,
-        registration_limit: u64,
-        min_lamports_price: u64,
+        title: String,
+        organizer: String,
+        description: String,
+        image_url: String,
+        location: String,
+        start_date: String,
+        start_time: String,
+        end_date: String,
+        end_time: String,
+        max_registration: u64,
+        lamports_price: u64,
     ) -> Result<()> {
-        // throws an exception if size of metadata_url is larger than 255 bytes
-        if METADATA_URL_LENGTH < metadata_url.len() {
-            return Err(ErrorCode::InvalidUrl.into());
-        }
-        // get state
-        let state = &mut ctx.accounts.state;
-        // get event
-        let event = &mut ctx.accounts.event;
-        // assign and increment event index
-        event.index = state.event_count;
-        state.event_count += 1; // increments variable used for event index
-        // assign values to event
-        event.authority = ctx.accounts.authority.key();
-        event.metadata_url = metadata_url;
-        event.registration_limit = registration_limit;
-        event.registration_count = 0;
-        event.min_lamports_price = min_lamports_price;
-
-        Ok(())
+        event::create_event(ctx, title, organizer, description, image_url, location,
+            start_date, start_time, end_date, end_time, max_registration, lamports_price)
     }
-
-    pub fn attendee_registers(
-        ctx: Context<AttendeeRegisters>,
-    ) -> Result<()> {
-        let event = &mut ctx.accounts.event;
-        if event.registration_count >= event.registration_limit {
-            return Err(ErrorCode::MaxCapacity.into())
-        }
-
-        system_program::transfer(
-            CpiContext::new(
-                ctx.accounts.system_program.to_account_info(),
-                system_program::Transfer {
-                    from: ctx.accounts.authority.to_account_info(),
-                    to: ctx.accounts.organizer.to_account_info(),
-                }
-            ),
-            event.min_lamports_price,
-        )?;
-
-        let registration = &mut ctx.accounts.registration;
-        registration.authority = ctx.accounts.authority.key();
-        registration.status = Status::Registered;
-        registration.index = event.registration_count;
-
-        event.registration_count += 1;
-        Ok(())
-    }
-}
-
-#[derive(Accounts)]
-pub struct CreateState<'info> {
-    // authenticating state account
-    #[account(
-        init,
-        seeds = [b"state".as_ref()],
-        bump,
-        payer = authority,
-        space = StateAccount::LEN + 8,
-    )]
-    pub state: Account<'info, StateAccount>,
-    // authority (signer who paid transaction fee)
-    #[account(mut)]
-    pub authority: Signer<'info>,
-    /// CHECK: System program
-    pub system_program: UncheckedAccount<'info>,
-    // Token program (no clue what it is)
-    #[account(constraint = token_program.key == &token::ID)]
-    pub token_program: Program<'info, Token>,
-}
-
-#[derive(Accounts)]
-pub struct CreateEvent<'info> {
-    // authenticate state account
-    #[account(
-        mut,
-        seeds = [b"state".as_ref()],
-        bump,
-    )]
-    pub state: Account<'info, StateAccount>,
-    // authenticate event account
-    #[account(
-        init,
-        seeds = [b"event".as_ref(), state.event_count.to_be_bytes().as_ref()],
-        bump,
-        payer = authority,
-        space = EventAccount::LEN,
-    )]
-    pub event: Account<'info, EventAccount>,
-    // authority (signer who pays transaction fee)
-    #[account(mut)]
-    pub authority: Signer<'info>,
-    /// CHECK: System program
-    pub system_program: UncheckedAccount<'info>,
-    #[account(constraint = token_program.key == &token::ID)]
-    pub token_program: Program<'info, Token>,
-}
-
-#[derive(Accounts)]
-pub struct AttendeeRegisters<'info> {
-    #[account(
-        mut,
-        seeds = [b"event".as_ref(), event.index.to_be_bytes().as_ref()],
-        bump
-    )]
-    pub event: Account<'info, EventAccount>,
-
-    #[account(
-        init,
-        seeds = [b"registration".as_ref(), event.index.to_be_bytes().as_ref(), event.registration_count.to_be_bytes().as_ref()],
-        bump,
-        payer = authority,
-        space = RegistrationAccount::LEN,
-    )]
-    pub registration: Account<'info, RegistrationAccount>,
-
-    // Authority (signer who paid transaction fee)
-    #[account(mut)]
-    pub authority: Signer<'info>,
-
-    // event organizer who created the event
-    #[account(constraint = organizer.key == &event.authority)]
-    pub organizer: Signer<'info>,
-
-    /// CHECK: System program
-    pub system_program: UncheckedAccount<'info>,
-
-    // Token program
-    #[account(constraint = token_program.key == &token::ID)]
-    pub token_program: Program<'info, Token>,
-}
-
-#[account]
-pub struct StateAccount {
-    pub authority: Pubkey, // signer address
-    pub event_count: u64, // use to assign to EventAccount.index
-}
-
-impl StateAccount {
-    // size of StateAccount in bytes
-    const LEN: usize = 32 + 8;
-}
-
-#[account]
-pub struct EventAccount {
-    pub authority: Pubkey, // event organizer
-    pub index: u64, // given by the StateAccount
-    pub metadata_url: String, // event metadata url
-    pub registration_limit: u64, // maximum number of Pubkeys allowed to register
-    pub registration_count: u64, // amount of Pubkeys currently registered
-    pub min_lamports_price: u64, // minimum registration price in lamports
-}
-
-impl EventAccount {
-    const LEN: usize = 32 + 64 + 64 + 64 + 64 + METADATA_URL_LENGTH;
-}
-
-#[account]
-pub struct RegistrationAccount {
-    pub authority: Pubkey,
-    pub index: u64,
-    pub status: Status,
-}
-
-impl RegistrationAccount {
-    const LEN: usize = 32 + 64 + size_of::<Status>();
-}
-
-#[derive(Debug, Clone, AnchorSerialize, AnchorDeserialize)]
-pub enum Status {
-    NotRegistered,
-    Registered,
-    AttendanceVerified,
-}
-
-#[error_code]
-pub enum ErrorCode {
-    #[msg("Event at maximum capacity")]
-    MaxCapacity,
-    #[msg("Metadata URL is too long")]
-    InvalidUrl,
 }

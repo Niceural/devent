@@ -117,6 +117,7 @@ Project prerequisites and links to how to install them:
 - [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
 - [yarn](https://classic.yarnpkg.com/en/docs/install#debian-stable)
 - [git](https://git-scm.com/downloads)
+- [Phantom wallet](https://phantom.app/)
 
 ### Installation
 
@@ -134,6 +135,7 @@ Project prerequisites and links to how to install them:
    ```sh
    touch .env
    ```
+5. Get some devnet SOL by pasting your public key on a SOL [faucet](https://solfaucet.com/)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
