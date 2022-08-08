@@ -71,14 +71,23 @@ describe("devent unit tests", () => {
     });
   });
 
-  /*
   describe("event", () => {
-    const metadataUrl =
-      "https://raw.githubusercontent.com/Niceural/devent/main/devent-program/tests/event1.json";
-    const registrationLimit = new anchor.BN(190);
-    const minLamportsPrice = new anchor.BN("3450000000");
+    const title = "Milkshake, Ministry of Sound - The Official Return 2022";
+    const organizer = "Milkshake";
+    const description =
+      "Milkshake, London's Biggest Student Night. Running 20 F*cking Years Strong, Since 2002 AND AFTER A MINISTRY OF SOUND REFURBISHMENT - WE BACK! Tuesday August 16th 2022 : On Sale Now. Ministry of Sound Club, 10:30pm-Late";
+    const location =
+      "Ministry of Sound, 103 Gaunt Street, London, SE1 6DP, United Kingdom";
+    const imageUrl =
+      "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F319134359%2F26253177781%2F1%2Foriginal.20220715-122927?w=800&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C25%2C768%2C384&s=810957612ec7d2eb9cc5eae100b7f1ac";
+    const startDate = "16/08/2022";
+    const startTime = "23:00";
+    const endDate = "17/08/2022";
+    const endTime = "04:00";
+    const maxRegistration = new anchor.BN(190);
+    const lamportsPrice = new anchor.BN("3500000000");
 
-    it("creates a new event with off chain metadata correctly", async () => {
+    it("successfully creates a new event", async () => {
       const [statePda] = await anchor.web3.PublicKey.findProgramAddress(
         [utf8.encode("state")],
         program.programId
@@ -91,8 +100,20 @@ describe("devent unit tests", () => {
         ],
         program.programId
       );
-      const tx = await program.methods
-        .createEvent(metadataUrl, registrationLimit, minLamportsPrice)
+      await program.methods
+        .createEvent(
+          title,
+          organizer,
+          description,
+          imageUrl,
+          location,
+          startDate,
+          startTime,
+          endDate,
+          endTime,
+          maxRegistration,
+          lamportsPrice
+        )
         .accounts({
           state: statePda,
           event: eventPda,
@@ -106,28 +127,87 @@ describe("devent unit tests", () => {
         "authority is invalid"
       );
       assert(eventData.index.eq(stateData.eventCount), "index is invalid");
-      assert.equal(
-        eventData.metadataUrl,
-        metadataUrl,
-        "metadata_url is invalid"
-      );
       assert(
-        eventData.registrationLimit.eq(registrationLimit),
-        "registration_limit is invalid"
+        eventData.maxRegistration.eq(maxRegistration),
+        "max_registration is invalid"
       );
       assert(
         eventData.registrationCount.eq(new anchor.BN("0")),
         "registration_count is invalid"
       );
       assert(
-        eventData.minLamportsPrice.eq(minLamportsPrice),
+        eventData.lamportsPrice.eq(lamportsPrice),
         "min_lamports_price is invalid"
       );
+      assert.equal(eventData.title, title, "title is invalid");
+      assert.equal(eventData.organizer, organizer, "organizer is invalid");
+      assert.equal(
+        eventData.description,
+        description,
+        "description is invalid"
+      );
+      assert.equal(eventData.imageUrl, imageUrl, "image_url is invalid");
+      assert.equal(eventData.location, location, "location is invalid");
+      assert.equal(eventData.startDate, startDate, "start_date is invalid");
+      assert.equal(eventData.startTime, startTime, "start_time is invalid");
+      assert.equal(eventData.endDate, endDate, "end_date is invalid");
+      assert.equal(eventData.endTime, endTime, "end_time is invalid");
+    });
+    it("throws if tries to recreate an event", async () => {
+      const [statePda] = await anchor.web3.PublicKey.findProgramAddress(
+        [utf8.encode("state")],
+        program.programId
+      );
+      const stateData = await program.account.stateAccount.fetch(statePda);
+      const eventIndex = stateData.eventCount.sub(new anchor.BN("1"));
+      const [eventPda] = await anchor.web3.PublicKey.findProgramAddress(
+        [utf8.encode("event"), eventIndex.toArrayLike(Buffer, "be", 8)],
+        program.programId
+      );
+      const eventDataBefore = await program.account.eventAccount.fetch(
+        eventPda
+      );
+      try {
+        await program.methods
+          .createEvent(
+            "title modified",
+            organizer,
+            description,
+            imageUrl,
+            location,
+            startDate,
+            startTime,
+            endDate,
+            endTime,
+            maxRegistration,
+            lamportsPrice
+          )
+          .accounts({
+            state: statePda,
+            event: eventPda,
+            authority: wallet.publicKey,
+            ...defaultAccounts,
+          })
+          .rpc();
+        assert(false, "no exceptions were thrown");
+      } catch (error) {
+        const eventDataAfter = await program.account.eventAccount.fetch(
+          eventPda
+        );
+        assert.equal(
+          eventDataBefore.title,
+          eventDataAfter.title,
+          "event data was modified"
+        );
+      }
+    });
+    it("gets all events", async () => {
+      const events = await program.account.eventAccount.all();
+      console.log(events);
     });
   });
-  */
 
   describe("registration", () => {
-    it("registers PublicKey and transfers lamports", async () => {});
+    // it("registers PublicKey and transfers lamports", async () => {});
   });
 });

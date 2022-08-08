@@ -3,16 +3,7 @@ import axios from "axios";
 import * as anchor from "@project-serum/anchor";
 import Image from "next/image";
 
-type OnChainData = {
-  authority: anchor.Address;
-  index: anchor.BN;
-  metadataPointer: string;
-  registrationLimit: anchor.BN;
-  registrationCount: anchor.BN;
-  minLamportsPrice: anchor.BN;
-};
-
-type OffChainData = {
+type EventData = {
   title: string;
   organizer: string;
   imageUrl: string;
@@ -22,17 +13,18 @@ type OffChainData = {
   startTime: string;
   endDate: string;
   endTime: string;
+  authority: anchor.Address;
+  index: anchor.BN;
+  maxRegistered: anchor.BN;
+  registrationCount: anchor.BN;
+  lamportsPrice: anchor.BN;
 };
 
 type EventProps = {
-  onChainData: OnChainData;
-  offChainData: OffChainData;
+  eventData: EventData;
 };
 
-const Event: FunctionComponent<EventProps> = ({
-  onChainData,
-  offChainData,
-}) => {
+const Event: FunctionComponent<EventProps> = ({ eventData }) => {
   const style = {
     wrapper: "",
     title: "",
@@ -45,32 +37,30 @@ const Event: FunctionComponent<EventProps> = ({
     endDate: "",
     endTime: "",
     price: "",
+    tickets: "",
   };
 
   return (
     <div className={style.wrapper}>
-      <div className={style.title}>Title: {offChainData.title}</div>
+      <div className={style.title}>Title: {eventData.title}</div>
       <Image
         className={style.image}
         alt="Event image"
-        src={offChainData.imageUrl}
+        src={eventData.imageUrl}
       />
-      <div className={style.organizer}>Organizer: {offChainData.organizer}</div>
+      <div className={style.organizer}>Organizer: {eventData.organizer}</div>
       <div className={style.description}>
-        Description: {offChainData.description}
+        Description: {eventData.description}
       </div>
-      <div className={style.location}>Location: {offChainData.location}</div>
-      <div className={style.startDate}>
-        Start date: {offChainData.startDate}
-      </div>
-      <div className={style.startTime}>
-        Start time: {offChainData.startTime}
-      </div>
-      <div className={style.endDate}>End date: {offChainData.endDate}</div>
-      <div className={style.endTime}>End time: {offChainData.endTime}</div>
+      <div className={style.location}>Location: {eventData.location}</div>
+      <div className={style.startDate}>Start date: {eventData.startDate}</div>
+      <div className={style.startTime}>Start time: {eventData.startTime}</div>
+      <div className={style.endDate}>End date: {eventData.endDate}</div>
+      <div className={style.endTime}>End time: {eventData.endTime}</div>
       <div className={style.price}>
-        Price: {onChainData.minLamportsPrice.toString()}
+        Price: {eventData.lamportsPrice.toString()}
       </div>
+      <div className={style.tickets}>Tickets left:</div>
     </div>
   );
 };

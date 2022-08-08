@@ -15,7 +15,10 @@ export default function getProgramInstance(
     anchor.AnchorProvider.defaultOptions()
   );
 
-  const program = new anchor.Program(PROGRAM_IDL, PROGRAM_ID, provider);
+  const idl = PROGRAM_IDL as anchor.Idl;
+  const programId = PROGRAM_ID;
+
+  const program = new anchor.Program(idl, programId, provider);
 
   return program;
 }

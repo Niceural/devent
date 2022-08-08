@@ -5,42 +5,50 @@ import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { SOLANA_HOST } from "../utils/const";
 import getProgramInstance from "../utils/get-program";
 const utf8 = anchor.utils.bytes.utf8;
+import Image from "next/image";
 
 type CreateEventProps = {
-  setOnChainSuccess: React.Dispatch<React.SetStateAction<boolean>>;
-  setOffChainSuccess: React.Dispatch<React.SetStateAction<boolean>>;
+  setSuccess: React.Dispatch<React.SetStateAction<boolean>>;
   setEventData: any;
 };
 
 const CreateEvent: FunctionComponent<CreateEventProps> = ({
-  setOnChainSuccess,
-  setOffChainSuccess,
+  setSuccess,
   setEventData,
 }) => {
   // component styling
   const style = {
     wrapper: "",
+    form: "",
+    title: "",
+    organizer: "",
+    description: "",
+    imageUrl: "",
+    image: "",
+    location: "",
+    startDate: "",
+    startTime: "",
+    endDate: "",
+    endTime: "",
+    maxRegistered: "",
+    price: "",
+    submitButton: "",
   };
 
   // states
   const wallet = useWallet();
-  // off chain data
+  // data
   const [title, setTitle] = useState("");
   const [organizer, setOrganizer] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
-  const [image, setImage] = useState(null);
   const [imageUrl, setImageUrl] = useState("");
   const [startDate, setStartDate] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endDate, setEndDate] = useState("");
   const [endTime, setEndTime] = useState("");
-  // on chain data
-  const [offChainMetadataUrl, setOffChainMetadataUrl] = useState("");
-  const [registrationLimit, setRegistrationLimit] = useState(
-    new anchor.BN("0")
-  );
-  const [minLamportsPrice, setMinLamportsPrice] = useState(new anchor.BN("0"));
+  const [maxRegistered, setMaxRegistered] = useState(new anchor.BN("0"));
+  const [lamportsPrice, setLamportsPrice] = useState(new anchor.BN("0"));
 
   const defaultAccounts = {
     tokenProgram: TOKEN_PROGRAM_ID,
@@ -50,22 +58,20 @@ const CreateEvent: FunctionComponent<CreateEventProps> = ({
   const handleSubmit = async (event: any) => {
     event.preventDefault();
     console.log("Creating a new event...");
-    await saveFileToPinata();
-    await saveMetadataToPinata();
-    await createOnchainEvent();
+    await createEvent();
     console.log("done.");
   };
 
-  const saveFileToPinata = async () => {};
+  // const saveFileToPinata = async () => {};
 
-  const saveMetadataToPinata = async () => {
-    setOffChainMetadataUrl(
-      "https://raw.githubusercontent.com/Niceural/devent/main/devent-program/tests/event1.json"
-    );
-    setOffChainSuccess(true);
-  };
+  // const saveMetadataToPinata = async () => {
+  //   setOffChainMetadataUrl(
+  //     "https://raw.githubusercontent.com/Niceural/devent/main/devent-program/tests/event1.json"
+  //   );
+  //   setOffChainSuccess(true);
+  // };
 
-  const createOnchainEvent = async () => {
+  const createEvent = async () => {
     console.log("Calling devent.create_event...");
 
     // web3 config stuff
@@ -84,7 +90,19 @@ const CreateEvent: FunctionComponent<CreateEventProps> = ({
     );
 
     const tx = await program.methods
-      .createEvent(offChainMetadataUrl, registrationLimit, minLamportsPrice)
+      .createEvent(
+        title,
+        organizer,
+        description,
+        imageUrl,
+        location,
+        startDate,
+        startTime,
+        endDate,
+        endTime,
+        maxRegistered,
+        lamportsPrice
+      )
       .accounts({
         state: statePda,
         event: eventPda,
@@ -92,10 +110,11 @@ const CreateEvent: FunctionComponent<CreateEventProps> = ({
         ...defaultAccounts,
       })
       .rpc();
+    await program.provider.connection.confirmTransaction(tx);
 
     const eventData = await program.account.eventAccount.fetch(eventPda);
     setEventData(eventData);
-    setOnChainSuccess(true);
+    setSuccess(true);
   };
 
   return (
@@ -106,93 +125,85 @@ const CreateEvent: FunctionComponent<CreateEventProps> = ({
         <input
           value={title}
           onChange={(event) => setTitle(event.target.value)}
-          className={style.formInput}
+          className={style.title}
           placeholder={"Title"}
         />
         Organizer
         <input
           value={organizer}
           onChange={(event) => setOrganizer(event.target.value)}
-          className={style.formInput}
+          className={style.organizer}
           placeholder={"Organizer"}
         />
         Description
         <input
           value={description}
           onChange={(event) => setDescription(event.target.value)}
-          className={style.formInput}
+          className={style.description}
           placeholder={"Description"}
         />
         Image
+        <Image className={style.image} alt="Event image" src={imageUrl} />
         <input
-          type="file"
-          // value={image}
-          onChange={(event) => {
-            setImage(event.target.files[0]);
-            // const file = event.target.files[0];
-            // if (file) {
-            //   const data = new FormData();
-            //   data.append("file", file);
-            //   setImage(data);
-            // }
-          }}
-          className={style.formInput}
+          value={imageUrl}
+          onChange={(event) => setImageUrl(event.target.value)}
+          className={style.imageUrl}
           placeholder={"Event image"}
         />
         Location
         <input
           value={location}
           onChange={(event) => setLocation(event.target.value)}
-          className={style.formInput}
+          className={style.location}
           placeholder={"Location"}
         />
         Start Date
         <input
           value={startDate}
           onChange={(event) => setStartDate(event.target.value)}
-          className={style.formInput}
+          className={style.startDate}
           placeholder={"Start date"}
         />
         Start Time
         <input
           value={startTime}
           onChange={(event) => setStartTime(event.target.value)}
-          className={style.formInput}
+          className={style.startTime}
           placeholder={"Start time"}
         />
         End Date
         <input
           value={endDate}
           onChange={(event) => setEndDate(event.target.value)}
-          className={style.formInput}
+          className={style.endDate}
           placeholder={"End date"}
         />
         End time
         <input
           value={endTime}
           onChange={(event) => setEndTime(event.target.value)}
-          className={style.formInput}
+          className={style.endTime}
           placeholder={"End time"}
         />
         Registration Limit
         <input
-          value={registrationLimit.toString()}
+          value={maxRegistered.toString()}
           onChange={(event) => {
-            setRegistrationLimit(new anchor.BN(event.target.value));
+            setMaxRegistered(new anchor.BN(event.target.value));
           }}
-          className={style.formInput}
+          className={style.maxRegistered}
           placeholder={"Maximum number of people allowed to register"}
         />
         Price in lamports
         <input
-          value={minLamportsPrice
+          value={lamportsPrice
             // .div(anchor.web3.LAMPORTS_PER_SOL)
             .toString()}
           onChange={(event) => {
             const val = new anchor.BN(event.target.value);
-            setMinLamportsPrice(val); // .mul(anchor.web3.LAMPORTS_PER_SOL));
+            setLamportsPrice(val); // .mul(anchor.web3.LAMPORTS_PER_SOL));
           }}
-          className={style.formInput}
+          className={style.price}
           placeholder={"Minimum price in lamports"}
         />
         <button

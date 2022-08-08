@@ -11,23 +11,18 @@ const Home: FunctionComponent<PageProps> = ({}) => {
     createEvent: "",
   };
 
-  const [onChainSuccess, setOnChainSuccess] = useState(false);
-  const [offChainSuccess, setOffChainSuccess] = useState(false);
-  const [eventData, setEventData] = useState(null);
+  const [success, setSuccess] = useState(false);
+  const [eventData, setEventData] = useState();
 
   return (
     <div className={style.wrapper}>
-      {onChainSuccess && offChainSuccess ? (
+      {success ? (
         <div className={style.event}>
           <Event eventData={eventData} />
         </div>
       ) : (
         <div className={style.createEvent}>
-          <CreateEvent
-            setOnChainSuccess={setOnChainSuccess}
-            setOffChainSuccess={setOffChainSuccess}
-            setEventData={setEventData}
-          />
+          <CreateEvent setSuccess={setSuccess} setEventData={setEventData} />
         </div>
       )}
     </div>
