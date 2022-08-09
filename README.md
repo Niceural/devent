@@ -105,6 +105,7 @@ This project consists in a decentralized application where users can create even
 - [Tailwindcss](https://tailwindcss.com/)
 - [Anchor](https://www.anchor-lang.com/)
 - [Solana](https://solana.com/)
+- [Metaplex](https://docs.metaplex.com/)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -127,20 +128,24 @@ Project prerequisites and links to how to install them:
 ### Installation
 
 1. Clone the repo
+
    ```sh
-   git clone https://github.com/Niceural/devent.git
-   cd devent/devent-frontend/
+   $ git clone https://github.com/Niceural/devent.git
+   $ cd devent/devent-frontend/
    ```
+
 2. Install NPM packages
    ```sh
-   yarn
+   $ yarn
    ```
-3. Create an account and create a new Pinata API key at [this](https://app.pinata.cloud/keys) link
-4. Create a [.env](./devent-frontend/.env) file and enter your API and API secret keys following [.env.example](./devent-frontend/.env.example) template:
-   ```sh
+3. Create a [Phantom wallet](https://phantom.app/) in your browser
+4. Get some devnet SOL by pasting your public key in a SOL [faucet](https://solfaucet.com/)
+
+<!-- 3. Create an account and create a new Pinata API key at [this](https://app.pinata.cloud/keys) link
+3. Create a [.env](./devent-frontend/.env) file and enter your API and API secret keys following [.env.example](./devent-frontend/.env.example) template:
+   ````sh
    touch .env
-   ```
-5. Get some devnet SOL by pasting your public key on a SOL [faucet](https://solfaucet.com/)
+   ``` -->
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -161,19 +166,28 @@ Project prerequisites and links to how to install them:
 - [ ] README
 - [ ] youtube presentation video
 - [ ] program
-  - [ ] create state
-  - [ ] create event
+  - [x] create state
+  - [x] create event
   - [ ] register to event
+  - [ ] ticket reselling
+  - [ ] confirm attendance
+  - [ ] mint nft on registration
+  - [ ] mint nft on attendance confirmation
 - [ ] frontend
   - [ ] home page
+    - [ ] styling
+    - [ ] display some events
   - [ ] create a new event page
-    - [ ] store file image with pinata
-    - [ ] store metadata with pinata
-    - [ ] store file image with nft.storage
-    - [ ] store metadata with nft.storage
-    - [ ] store metadata on chain
+    - [ ] styling
+    - [ ] create a new event form
+    - [ ] display created event
   - [ ] all events page
+    - [ ] styling
+    - [ ] display all events
+    - [ ] event component
   - [ ] register for event page
+    - [ ] styling
+    - [ ] registration form
 
 See the [open issues](https://github.com/Niceural/devent/issues) for a full list of proposed features (and known issues).
 
@@ -221,6 +235,10 @@ Project Link: [https://github.com/Niceural/devent](https://github.com/Niceural/d
 - [Build Facebook 3.0 on Blockchain with Solana | Next.js | Netlify | Sanity.io](https://youtu.be/8v5lFscLPRY)
 - [Build TikTok Web 3.0 Blockchain App with Solana | Rust | Next.js | Netlify](https://youtu.be/qIGs3XWybgU)
 - [Coding & Crypto](https://www.youtube.com/c/CodingCrypto)
+- [Metaplex](https://docs.metaplex.com/)
+- [Solana cookbook](https://solanacookbook.com/)
+- [Solana Blockchain Developer Bootcamp 2022](https://chain.link/bootcamp/solana-2022-on-demand)
+- [Eventbrite](https://www.eventbrite.co.uk/)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
