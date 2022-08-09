@@ -19,8 +19,9 @@ const CreateEvent: FunctionComponent<CreateEventProps> = ({
   // component styling
   const style = {
     wrapper: "",
+    pageTitle: "",
     form: "",
-    title: "",
+    title: "relative z-0 mb-6 w-full group",
     organizer: "",
     description: "",
     imageUrl: "",
@@ -118,99 +119,167 @@ const CreateEvent: FunctionComponent<CreateEventProps> = ({
   };
 
   return (
-    <div className={style.wrapper}>
-      Create a new Event:
-      <form className={style.form}>
-        Title
-        <input
-          value={title}
-          onChange={(event) => setTitle(event.target.value)}
-          className={style.title}
-          placeholder={"Title"}
-        />
-        Organizer
-        <input
-          value={organizer}
-          onChange={(event) => setOrganizer(event.target.value)}
-          className={style.organizer}
-          placeholder={"Organizer"}
-        />
-        Description
-        <input
-          value={description}
-          onChange={(event) => setDescription(event.target.value)}
-          className={style.description}
-          placeholder={"Description"}
-        />
-        Image
-        <Image className={style.image} alt="Event image" src={imageUrl} />
-        <input
-          value={imageUrl}
-          onChange={(event) => setImageUrl(event.target.value)}
-          className={style.imageUrl}
-          placeholder={"Event image"}
-        />
-        Location
-        <input
-          value={location}
-          onChange={(event) => setLocation(event.target.value)}
-          className={style.location}
-          placeholder={"Location"}
-        />
-        Start Date
-        <input
-          value={startDate}
-          onChange={(event) => setStartDate(event.target.value)}
-          className={style.startDate}
-          placeholder={"Start date"}
-        />
-        Start Time
-        <input
-          value={startTime}
-          onChange={(event) => setStartTime(event.target.value)}
-          className={style.startTime}
-          placeholder={"Start time"}
-        />
-        End Date
-        <input
-          value={endDate}
-          onChange={(event) => setEndDate(event.target.value)}
-          className={style.endDate}
-          placeholder={"End date"}
-        />
-        End time
-        <input
-          value={endTime}
-          onChange={(event) => setEndTime(event.target.value)}
-          className={style.endTime}
-          placeholder={"End time"}
-        />
-        Registration Limit
-        <input
-          value={maxRegistered.toString()}
-          onChange={(event) => {
-            setMaxRegistered(new anchor.BN(event.target.value));
-          }}
-          className={style.maxRegistered}
-          placeholder={"Maximum number of people allowed to register"}
-        />
-        Price in lamports
-        <input
-          value={lamportsPrice
-            // .div(anchor.web3.LAMPORTS_PER_SOL)
-            .toString()}
-          onChange={(event) => {
-            const val = new anchor.BN(event.target.value);
-            setLamportsPrice(val); // .mul(anchor.web3.LAMPORTS_PER_SOL));
-          }}
-          className={style.price}
-          placeholder={"Minimum price in lamports"}
-        />
+    <div className="p-3">
+      <div className="pb-3 text-lg font-medium">Create a new Event</div>
+      <form>
+        <div className="relative z-0 mb-6 w-full group">
+          <input
+            type="text"
+            name="floatingTitle"
+            id="floatingTitle"
+            className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+            placeholder={" "}
+            value={title}
+            onChange={(event) => setTitle(event.target.value)}
+          />
+          <label
+            htmlFor="floatingTitle"
+            className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+          >
+            Title
+          </label>
+        </div>
+        <div className="relative z-0 mb-6 w-full group">
+          <input
+            type="text"
+            name="floatingOrganizer"
+            id="floatingOrganizer"
+            className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+            placeholder={" "}
+            value={organizer}
+            onChange={(event) => setOrganizer(event.target.value)}
+          />
+          <label
+            htmlFor="floatingOrganizer"
+            className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+          >
+            Organizer
+          </label>
+        </div>
+        <div className="relative z-0 mb-6 w-full group">
+          <input
+            type="text"
+            name="floatingDescription"
+            id="floatingDescription"
+            className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+            placeholder={" "}
+            value={description}
+            onChange={(event) => setDescription(event.target.value)}
+          />
+          <label
+            htmlFor="floatingDescription"
+            className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+          >
+            Description
+          </label>
+        </div>
+        <div className="relative z-0 mb-6 w-full group">
+          <input
+            type="text"
+            name="floatingImageUrl"
+            id="floatingImageUrl"
+            className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+            placeholder={" "}
+            value={imageUrl}
+            onChange={(event) => setImageUrl(event.target.value)}
+          />
+          <label
+            htmlFor="floatingImageUrl"
+            className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+          >
+            Image URL
+          </label>
+        </div>
+        <div className="relative z-0 mb-6 w-full group">
+          <input
+            type="text"
+            name="floatingLocation"
+            id="floatingLocation"
+            className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+            placeholder={" "}
+            value={location}
+            onChange={(event) => setLocation(event.target.value)}
+          />
+          <label
+            htmlFor="floatingLocation"
+            className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+          >
+            Location
+          </label>
+        </div>
+        <div className="relative z-0 mb-6 w-full group">
+          <input
+            type="text"
+            name="floatingStartDate"
+            id="floatingStartDate"
+            className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+            placeholder={" "}
+            value={startDate}
+            onChange={(event) => setStartDate(event.target.value)}
+          />
+          <label
+            htmlFor="floatingStartDate"
+            className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+          >
+            Start date
+          </label>
+        </div>
+        <div className="relative z-0 mb-6 w-full group">
+          <input
+            type="text"
+            name="floatingStartTime"
+            id="floatingStartTime"
+            className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+            placeholder={" "}
+            value={startTime}
+            onChange={(event) => setStartTime(event.target.value)}
+          />
+          <label
+            htmlFor="floatingStartTime"
+            className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+          >
+            Start time
+          </label>
+        </div>
+        <div className="relative z-0 mb-6 w-full group">
+          <input
+            type="text"
+            name="floatingEndDate"
+            id="floatingEndDate"
+            className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+            placeholder={" "}
+            value={endDate}
+            onChange={(event) => setEndDate(event.target.value)}
+          />
+          <label
+            htmlFor="floatingEndDate"
+            className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+          >
+            End date
+          </label>
+        </div>
+        <div className="relative z-0 mb-6 w-full group">
+          <input
+            type="text"
+            name="floatingEndTime"
+            id="floatingEndTime"
+            className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+            placeholder={" "}
+            value={endTime}
+            onChange={(event) => setEndTime(event.target.value)}
+          />
+          <label
+            htmlFor="floatingEndTime"
+            className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+          >
+            End time
+          </label>
+        </div>
         <button
-          className={style.submitButton}
+          className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
           type="submit"
           onClick={handleSubmit}
-          value="Create"
+          value="Create new event"
         />
       </form>
     </div>
