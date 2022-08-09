@@ -18,7 +18,7 @@ const Header: FunctionComponent<HeaderProps> = ({}) => {
           <a>
             <Image
               alt="logo"
-              src="/../public/devent-logo.png"
+              src="/images/devent-logo.png"
               width={60}
               height={60}
             />

@@ -36,19 +36,16 @@ pub mod devent {
     /// Creates a new event.
     pub fn create_event(
         ctx: Context<CreateEvent>,
-        title: String,
-        organizer: String,
-        description: String,
-        image_url: String,
-        location: String,
-        start_date: String,
-        start_time: String,
-        end_date: String,
-        end_time: String,
         max_registration: u64,
-        lamports_price: u64,
+        registration_price: u64,
+        resell_allowed: bool,
+        max_resell_price: u64,
+        mint_nft_on_registration: bool,
+        mint_nft_on_attendance: bool,
+        paused: bool,
+        event_data: EventData,
     ) -> Result<()> {
-        event::create_event(ctx, title, organizer, description, image_url, location,
-            start_date, start_time, end_date, end_time, max_registration, lamports_price)
+        event::create_event(ctx, max_registration, registration_price, resell_allowed, max_resell_price,
+        mint_nft_on_registration, mint_nft_on_attendance, paused, event_data)
     }
 }

@@ -17,46 +17,37 @@ const END_TIME_LENGTH: usize = 4;
 /// Creates a new event.
 pub fn create_event(
     ctx: Context<CreateEvent>,
-    title: String,
-    organizer: String,
-    description: String,
-    image_url: String,
-    location: String,
-    start_date: String,
-    start_time: String,
-    end_date: String,
-    end_time: String,
     max_registration: u64,
-    lamports_price: u64,
+    registration_price: u64,
+    resell_allowed: bool,
+    max_resell_price: u64,
+    mint_nft_on_registration: bool,
+    mint_nft_on_attendance: bool,
+    paused: bool,
+    event_data: EventData,
 ) -> Result<()> {
     // throws if inputs not of the correct size
 
-    // get state
+    // get accounts
     let state = &mut ctx.accounts.state;
-
-    // get event
     let event = &mut ctx.accounts.event;
+    let authority = ctx.accounts.authority.key();
 
     // assign and increment event index
     event.index = state.event_count;
     state.event_count += 1; // increments variable used for event index
 
     // assign values to event
-    event.authority = ctx.accounts.authority.key();
+    event.authority = authority;
     event.max_registration = max_registration;
     event.registration_count = 0;
-    event.lamports_price = lamports_price;
-
-    // event data
-    event.title = title;
-    event.organizer = organizer;
-    event.description = description;
-    event.image_url = image_url;
-    event.location = location;
-    event.start_date = start_date;
-    event.start_time = start_time;
-    event.end_date = end_date;
-    event.end_time = end_time;
+    event.registration_price = registration_price;
+    event.resell_allowed = resell_allowed;
+    event.max_resell_price = max_resell_price;
+    event.mint_nft_on_registration = mint_nft_on_registration;
+    event.mint_nft_on_attendance = mint_nft_on_attendance;
+    event.paused = paused;
+    event.event_data = event_data;
 
     Ok(())
 }
@@ -98,9 +89,17 @@ pub struct EventAccount {
     pub index: u64, // given by the StateAccount
     pub max_registration: u64, // maximum number of Pubkeys allowed to register
     pub registration_count: u64, // amount of Pubkeys currently registered
-    pub lamports_price: u64, // minimum registration price in lamports
+    pub registration_price: u64, // minimum registration price in lamports
+    pub resell_allowed: bool, // set to true if pubkey registered is allowed to resell their ticket
+    pub max_resell_price: u64, // maximum resell price
+    pub mint_nft_on_registration: bool,
+    pub mint_nft_on_attendance: bool,
+    pub paused: bool, // if true, can't register, resell ticket, etc
+    pub event_data: EventData, // event data
+}
 
-    // event data
+#[derive(Debug, Clone, AnchorSerialize, AnchorDeserialize)]
+pub struct EventData {
     pub title: String,
     pub organizer: String,
     pub description: String,
