@@ -1,7 +1,7 @@
 import React, { FunctionComponent, useState } from "react";
 import * as anchor from "@project-serum/anchor";
-import { useWallet } from "@solana/wallet-adapter-react";
-import { Event, EventData, createEvent } from "../../devent-sdk/src/event";
+import { useWallet, WalletContextState } from "@solana/wallet-adapter-react";
+import { Event, EventData, createEvent } from "@niceural/devent-sdk";
 import { SOLANA_HOST } from "../utils/const";
 
 type CreateEventProps = {
@@ -15,6 +15,7 @@ const CreateEvent: FunctionComponent<CreateEventProps> = ({
 }) => {
   // states
   const wallet = useWallet();
+  wallet.sign;
   // data
   const [title, setTitle] = useState("");
   const [organizer, setOrganizer] = useState("");

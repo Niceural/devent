@@ -157,6 +157,13 @@ Project prerequisites and links to how to install them:
 
 ### Register for an event
 
+### At the gates of Ed Sheeran's concert, how to check if someone has a ticket?
+
+The ticket verification process needs to meed the following requirements:
+
+- speed: in the case of long queues, verifying a ticket should be as quick as scanning a QR Code and shouldn't involve human eyes;
+-
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- ROADMAP -->
@@ -173,6 +180,11 @@ Project prerequisites and links to how to install them:
   - [ ] confirm attendance
   - [ ] mint nft on registration
   - [ ] mint nft on attendance confirmation
+- [ ] sdk
+  - [ ] create event
+  - [ ] create registration
+  - [ ] resell registration
+  - [ ] confirm attendance
 - [ ] frontend
   - [ ] home page
     - [ ] styling

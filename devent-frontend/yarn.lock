@@ -316,6 +316,15 @@
     jsbi "^3.1.5"
     sha.js "^2.4.11"
 
+"@niceural/devent-sdk@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@niceural/devent-sdk/-/devent-sdk-1.0.0.tgz#55d39176d9f9afccc9bacddeb07eb4bd320e409a"
+  integrity sha512-yYwnYHtm3RkWeQQCS2svTlB+SuPhXHMz78bvIIUalwUYI1JuzraGIGockXOfdRyp1HP1OEofaYPKIHT+kbH6QQ==
+  dependencies:
+    "@project-serum/anchor" "^0.25.0"
+    "@solana/spl-token" "^0.2.0"
+    "@solana/web3.js" "^1.50.1"
+
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
   resolved "https://registry.yarnpkg.com/@nodelib/fs.scandir/-/fs.scandir-2.1.5.tgz#7619c2eb21b25483f6d167548b4cfd5a7488c3d5"

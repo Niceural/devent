@@ -1,20 +1,16 @@
 use anchor_lang::prelude::*;
-// use anchor_lang::system_program;
 use anchor_spl::token::{self, Token};
+use std::mem::size_of;
 use crate::state::StateAccount;
 
-// event data variable sizes
-const TITLE_LENGTH: usize = 64;
-const ORGANIZER_LENGTH: usize = 32;
-const DESCRIPTION_LENGTH: usize = 255;
-const IMAGE_URL_LENGTH: usize = 255;
-const LOCATION_LENGTH: usize = 64;
-const START_DATE_LENGTH: usize = 8;
-const START_TIME_LENGTH: usize = 4;
-const END_DATE_LENGTH: usize = 8;
-const END_TIME_LENGTH: usize = 4;
-
 /// Creates a new event.
+/// @param max_registration Maximum number of Pubkeys allowed to register
+/// @param registration_price Ticket price in lamports
+/// @param resell_allowed Set to true if the ticket can be resold
+/// @param max_resell_price Maximum ticket resell price
+/// @param mintNftOnRegistration If set to true, an nft will be minted on registration to this event
+/// @param mintNftOnAttendance If set to true, an nft will be minted on attendance confirmation to the event
+/// @param paused If set to true, can't register or resell
 pub fn create_event(
     ctx: Context<CreateEvent>,
     max_registration: u64,
@@ -24,21 +20,17 @@ pub fn create_event(
     mint_nft_on_registration: bool,
     mint_nft_on_attendance: bool,
     paused: bool,
-    event_data: EventData,
 ) -> Result<()> {
-    // throws if inputs not of the correct size
-
     // get accounts
     let state = &mut ctx.accounts.state;
     let event = &mut ctx.accounts.event;
-    let authority = ctx.accounts.authority.key();
 
     // assign and increment event index
     event.index = state.event_count;
     state.event_count += 1; // increments variable used for event index
 
     // assign values to event
-    event.authority = authority;
+    event.authority = ctx.accounts.authority.key();
     event.max_registration = max_registration;
     event.registration_count = 0;
     event.registration_price = registration_price;
@@ -47,7 +39,6 @@ pub fn create_event(
     event.mint_nft_on_registration = mint_nft_on_registration;
     event.mint_nft_on_attendance = mint_nft_on_attendance;
     event.paused = paused;
-    event.event_data = event_data;
 
     Ok(())
 }
@@ -68,7 +59,7 @@ pub struct CreateEvent<'info> {
         seeds = [b"event".as_ref(), state.event_count.to_be_bytes().as_ref()],
         bump,
         payer = authority,
-        space = EventAccount::LEN,
+        space = size_of::<EventAccount>() + 8,
     )]
     pub event: Account<'info, EventAccount>,
 
@@ -95,25 +86,4 @@ pub struct EventAccount {
     pub mint_nft_on_registration: bool,
     pub mint_nft_on_attendance: bool,
     pub paused: bool, // if true, can't register, resell ticket, etc
-    pub event_data: EventData, // event data
-}
-
-#[derive(Debug, Clone, AnchorSerialize, AnchorDeserialize)]
-pub struct EventData {
-    pub title: String,
-    pub organizer: String,
-    pub description: String,
-    pub image_url: String,
-    pub location: String,
-    pub start_date: String,
-    pub start_time: String,
-    pub end_date: String,
-    pub end_time: String,
-}
-
-impl EventAccount {
-    const LEN: usize = 32 + 8 + 8 + 8 + 8 + 
-        TITLE_LENGTH + ORGANIZER_LENGTH + DESCRIPTION_LENGTH + 
-        IMAGE_URL_LENGTH + LOCATION_LENGTH + START_DATE_LENGTH + 
-        START_TIME_LENGTH + END_DATE_LENGTH + END_TIME_LENGTH;
 }

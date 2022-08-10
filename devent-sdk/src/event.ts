@@ -1,32 +1,13 @@
 import * as anchor from "@project-serum/anchor";
 import { DEFAULT_ACCOUNTS, PROGRAM_ID, PROGRAM_IDL } from "../utils/const";
 import { EventCreationError, StateNotCreatedError } from "./errors";
+import { EventAccount, CreateEvent } from "./types";
 const utf8 = anchor.utils.bytes.utf8;
 
-export interface EventData {
-  title: String;
-  organizer: String;
-  description: String;
-  imageUrl: String;
-  location: String;
-  startDate: String;
-  startTime: String;
-  endDate: String;
-  endTime: String;
-}
-
-export interface Event {
-  maxRegistration: anchor.BN;
-  registrationPrice: anchor.BN;
-  resellAllowed: boolean;
-  maxResellPrice: anchor.BN;
-  mintNftOnRegistration: boolean;
-  mintNftOnAttendance: boolean;
-  paused: boolean;
-  eventData: EventData;
-}
-
-export async function createEvent(provider: anchor.Provider, event: Event) {
+export async function createEvent(
+  provider: anchor.Provider,
+  event: CreateEvent
+): Promise<EventAccount> {
   // get program instance
   const program = new anchor.Program(PROGRAM_IDL, PROGRAM_ID, provider);
 
@@ -63,17 +44,6 @@ export async function createEvent(provider: anchor.Provider, event: Event) {
         event.mintNftOnAttendance,
         event.paused,
         event.eventData
-        // {
-        //   title: event.eventData.title,
-        //   organizer: event.eventData.organizer,
-        //   description: event.eventData.description,
-        //   imageUrl: event.eventData.imageUrl,
-        //   location: event.eventData.location,
-        //   startDate: event.eventData.startDate,
-        //   startTime: event.eventData.startTime,
-        //   endDate: event.eventData.endDate,
-        //   endTime: event.eventData.endTime,
-        // }
       )
       .accounts({
         state: statePda,
@@ -96,5 +66,6 @@ export async function createEvent(provider: anchor.Provider, event: Event) {
 
   // get EventAccount data
   const eventInfo = await program.account.eventAccount.fetch(eventPda);
-  return eventInfo;
+
+  return eventInfo as EventAccount;
 }

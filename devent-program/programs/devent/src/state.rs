@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
-// use anchor_lang::system_program;
 use anchor_spl::token::{self, Token};
+use std::mem::size_of;
 
 /// Initializes the state of the program. 
 /// The program state must be created before any event is created.
@@ -27,7 +27,7 @@ pub struct CreateState<'info> {
         seeds = [b"state".as_ref()],
         bump,
         payer = authority,
-        space = StateAccount::LEN,
+        space = size_of::<StateAccount>(),
     )]
     pub state: Account<'info, StateAccount>,
 
@@ -38,7 +38,7 @@ pub struct CreateState<'info> {
     /// CHECK: System program
     pub system_program: UncheckedAccount<'info>,
 
-    // Token program (no clue what it is)
+    // Token program
     #[account(constraint = token_program.key == &token::ID)]
     pub token_program: Program<'info, Token>,
 }
@@ -47,9 +47,4 @@ pub struct CreateState<'info> {
 pub struct StateAccount {
     pub authority: Pubkey, // signer address
     pub event_count: u64, // used to assign to event index
-}
-
-impl StateAccount {
-    // size of StateAccount in bytes
-    const LEN: usize = 32 + 8;
 }

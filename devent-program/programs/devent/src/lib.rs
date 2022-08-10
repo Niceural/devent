@@ -11,9 +11,8 @@ declare_id!("59sCeP718NpdHv3Xj6kjgrmGNEt67BNXFcy5VUBUDhJE");
 pub mod state; use state::*;
 pub mod event; use event::*;
 pub mod registration; use registration::*;
-pub mod resell; use resell::*;
 pub mod error; use error::*;
-pub mod mint_nft; use mint_nft::*;
+// pub mod mint_nft; use mint_nft::*;
 
 #[program]
 pub mod devent {
@@ -39,10 +38,9 @@ pub mod devent {
         mint_nft_on_registration: bool,
         mint_nft_on_attendance: bool,
         paused: bool,
-        event_data: EventData,
     ) -> Result<()> {
         event::create_event(ctx, max_registration, registration_price, resell_allowed, max_resell_price,
-        mint_nft_on_registration, mint_nft_on_attendance, paused, event_data)
+        mint_nft_on_registration, mint_nft_on_attendance, paused)
     }
 
     /// Register a Pubkey to an event
@@ -50,5 +48,12 @@ pub mod devent {
         ctx: Context<CreateRegistration>,
     ) -> Result<()> {
         registration::create_registration(ctx)
+    }
+
+    pub fn update_registration(
+        ctx: Context<UpdateRegistration>,
+        price: u64,
+    ) -> Result<()> {
+        registration::update_registration(ctx, price)
     }
 }

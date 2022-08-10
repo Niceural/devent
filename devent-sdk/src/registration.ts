@@ -5,15 +5,16 @@ const utf8 = anchor.utils.bytes.utf8;
 
 export async function createRegistration(
   provider: anchor.Provider,
+  buyer: anchor.web3.Signer,
   eventAddress: anchor.Address
 ) {
   // get program instance
   const program = new anchor.Program(PROGRAM_IDL, PROGRAM_ID, provider);
 
   // get event data
-  let eventData;
+  let eventAccount;
   try {
-    eventData = await program.account.eventAccount.fetch(eventAddress);
+    eventAccount = await program.account.eventAccount.fetch(eventAddress);
   } catch (error) {
     throw new EventNotCreatedError(error);
   }
@@ -22,8 +23,8 @@ export async function createRegistration(
   const [registrationPda] = await anchor.web3.PublicKey.findProgramAddress(
     [
       utf8.encode("registration"),
-      eventData.index.toArrayLike(Buffer, "be", 8),
-      eventData.registrationCount.toArrayLike(Buffer, "be", 8),
+      eventAccount.index.toArrayLike(Buffer, "be", 8),
+      eventAccount.registrationCount.toArrayLike(Buffer, "be", 8),
     ],
     program.programId
   );
@@ -37,9 +38,10 @@ export async function createRegistration(
         event: eventAddress,
         registration: registrationPda,
         authority: provider.publicKey,
-        organizer: eventData.authority,
+        organizer: eventAccount.authority,
         ...DEFAULT_ACCOUNTS,
       })
+      .signers([buyer])
       .rpc();
   } catch (error) {
     throw new RegistrationCreationError(error);

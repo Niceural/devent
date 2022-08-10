@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@niceural/devent-sdk": "^1.0.0",
     "@project-serum/anchor": "^0.25.0",
     "@solana/spl-token": "^0.2.0",
     "@solana/wallet-adapter-react": "^0.15.9",
