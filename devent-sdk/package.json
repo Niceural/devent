@@ -1,12 +1,27 @@
 {
   "name": "devent-sdk",
   "version": "1.0.0",
-  "main": "src/index.ts",
   "author": "Nicolas Bayle",
   "license": "MIT",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "module": "dist/devent-sdk.esm.js",
+  "scripts": {
+    "build": "tsdx build",
+    "start": "tsdx watch",
+    "test": "tsdx test",
+    "prepublishOnly": "tsdx build"
+  },
   "devDependencies": {
     "@project-serum/anchor": "^0.25.0",
     "@solana/spl-token": "^0.2.0",
-    "@solana/web3.js": "^1.50.1"
+    "@solana/web3.js": "^1.50.1",
+    "tsdx": "^0.14.1"
+  },
+  "engines": {
+    "node": ">=10"
   }
 }

@@ -8,16 +8,12 @@ use std::mem::size_of;
 
 declare_id!("59sCeP718NpdHv3Xj6kjgrmGNEt67BNXFcy5VUBUDhJE");
 
-pub mod state;
-pub mod event;
-pub mod registration;
-pub mod error;
-pub mod mint_nft;
-use state::*;
-use event::*;
-use registration::*;
-use error::*;
-use mint_nft::*;
+pub mod state; use state::*;
+pub mod event; use event::*;
+pub mod registration; use registration::*;
+pub mod resell; use resell::*;
+pub mod error; use error::*;
+pub mod mint_nft; use mint_nft::*;
 
 #[program]
 pub mod devent {
@@ -47,5 +43,12 @@ pub mod devent {
     ) -> Result<()> {
         event::create_event(ctx, max_registration, registration_price, resell_allowed, max_resell_price,
         mint_nft_on_registration, mint_nft_on_attendance, paused, event_data)
+    }
+
+    /// Register a Pubkey to an event
+    pub fn create_registration(
+        ctx: Context<CreateRegistration>,
+    ) -> Result<()> {
+        registration::create_registration(ctx)
     }
 }

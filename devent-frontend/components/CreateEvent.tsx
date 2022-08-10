@@ -1,11 +1,8 @@
 import React, { FunctionComponent, useState } from "react";
 import * as anchor from "@project-serum/anchor";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { Event, EventData, createEvent } from "../../devent-sdk/src/event";
 import { SOLANA_HOST } from "../utils/const";
-import getProgramInstance from "../utils/get-program";
-const utf8 = anchor.utils.bytes.utf8;
-import Image from "next/image";
 
 type CreateEventProps = {
   setSuccess: React.Dispatch<React.SetStateAction<boolean>>;
@@ -16,50 +13,66 @@ const CreateEvent: FunctionComponent<CreateEventProps> = ({
   setSuccess,
   setEventData,
 }) => {
-  // component styling
-  const style = {
-    wrapper: "",
-    pageTitle: "",
-    form: "",
-    title: "relative z-0 mb-6 w-full group",
-    organizer: "",
-    description: "",
-    imageUrl: "",
-    image: "",
-    location: "",
-    startDate: "",
-    startTime: "",
-    endDate: "",
-    endTime: "",
-    maxRegistered: "",
-    price: "",
-    submitButton: "",
-  };
-
   // states
   const wallet = useWallet();
   // data
   const [title, setTitle] = useState("");
   const [organizer, setOrganizer] = useState("");
   const [description, setDescription] = useState("");
-  const [location, setLocation] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [location, setLocation] = useState("");
   const [startDate, setStartDate] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endDate, setEndDate] = useState("");
   const [endTime, setEndTime] = useState("");
-  const [maxRegistered, setMaxRegistered] = useState(new anchor.BN("0"));
-  const [lamportsPrice, setLamportsPrice] = useState(new anchor.BN("0"));
-
-  const defaultAccounts = {
-    tokenProgram: TOKEN_PROGRAM_ID,
-    systemProgram: anchor.web3.SystemProgram.programId,
-  };
+  const [maxRegistration, setMaxRegistration] = useState(new anchor.BN("0"));
+  const [registrationPrice, setRegistrationPrice] = useState(
+    new anchor.BN("0")
+  );
+  const [resellAllowed, setResellAllowed] = useState(true);
+  const [maxResellPrice, setMaxResellPrice] = useState(new anchor.BN("0"));
+  const [mintNftOnRegistration, setMintNftOnRegistration] = useState(true);
+  const [mintNftOnAttendance, setMintNftOnAttendance] = useState(true);
+  const [paused, setPaused] = useState(false);
 
   const handleSubmit = async (event: any) => {
     event.preventDefault();
     console.log("Creating a new event...");
-    await createEvent();
+
+    // web3 config stuff
+    const connection = new anchor.web3.Connection(SOLANA_HOST);
+    const provider = new anchor.AnchorProvider(
+      connection,
+      wallet,
+      anchor.AnchorProvider.defaultOptions()
+    );
+
+    // function arguments
+    const eventData: EventData = {
+      title: title,
+      organizer: organizer,
+      description: description,
+      imageUrl: imageUrl,
+      location: location,
+      startDate: startDate,
+      startTime: startTime,
+      endDate: endDate,
+      endTime: endTime,
+    };
+    const ocEvent: Event = {
+      maxRegistration: maxRegistration,
+      registrationPrice: registrationPrice,
+      resellAllowed: resellAllowed,
+      maxResellPrice: maxResellPrice,
+      mintNftOnRegistration: mintNftOnRegistration,
+      mintNftOnAttendance: mintNftOnAttendance,
+      paused: paused,
+      eventData: eventData,
+    };
+    const eventInfo = await createEvent(provider, ocEvent);
+
+    setEventData(eventInfo);
+    setSuccess(true);
     console.log("done.");
   };
 
@@ -72,6 +85,7 @@ const CreateEvent: FunctionComponent<CreateEventProps> = ({
   //   setOffChainSuccess(true);
   // };
 
+  /*
   const createEvent = async () => {
     console.log("Calling devent.create_event...");
 
@@ -117,6 +131,7 @@ const CreateEvent: FunctionComponent<CreateEventProps> = ({
     setEventData(eventData);
     setSuccess(true);
   };
+  */
 
   return (
     <div className="p-3">
