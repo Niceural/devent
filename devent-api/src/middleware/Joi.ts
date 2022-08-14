@@ -2,6 +2,7 @@ import Joi, { ObjectSchema } from "joi";
 import { NextFunction, Request, Response } from "express";
 import { IUser } from "../models/User";
 import Logging from "../library/Logging";
+import { ITicketBatch } from "../models/TicketBatch";
 
 export const ValidateJoi = (schema: ObjectSchema) => {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -26,18 +27,12 @@ export const Schemas = {
       pubkey: Joi.string().required(),
     }),
   },
-  //   book: {
-  //     create: Joi.object<IBook>({
-  //       user: Joi.string()
-  //         .regex(/^[0-9a-fA-F]{24}$/)
-  //         .required(),
-  //       title: Joi.string().required(),
-  //     }),
-  //     update: Joi.object<IBook>({
-  //       user: Joi.string()
-  //         .regex(/^[0-9a-fA-F]{24}$/)
-  //         .required(),
-  //       title: Joi.string().required(),
-  //     }),
-  //   },
+  ticketBatch: {
+    create: Joi.object<ITicketBatch>({
+      mintPubkey: Joi.string().required(),
+    }),
+    update: Joi.object<ITicketBatch>({
+      mintPubkey: Joi.string().required(),
+    }),
+  },
 };
