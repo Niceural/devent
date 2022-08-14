@@ -2,6 +2,7 @@ import * as anchor from "@project-serum/anchor";
 import { assert, expect } from "chai";
 import { Devent } from "../target/types/devent";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { AnchorError } from "@project-serum/anchor";
 
 describe("devent unit tests", () => {
   const provider = anchor.AnchorProvider.env();
@@ -13,13 +14,38 @@ describe("devent unit tests", () => {
     tokenProgram: TOKEN_PROGRAM_ID,
     systemProgram: anchor.web3.SystemProgram.programId,
   };
+  async function getStatePda(): Promise<anchor.web3.PublicKey> {
+    const [statePda] = await anchor.web3.PublicKey.findProgramAddress(
+      [utf8.encode("state")],
+      program.programId
+    );
+    return statePda;
+  }
+  async function getEventPda(index: anchor.BN): Promise<anchor.web3.PublicKey> {
+    const [eventPda] = await anchor.web3.PublicKey.findProgramAddress(
+      [utf8.encode("event"), index.toArrayLike(Buffer, "be", 8)],
+      program.programId
+    );
+    return eventPda;
+  }
+  async function getRegistrationPda(
+    eventIndex: anchor.BN,
+    registrationIndex: anchor.BN
+  ): Promise<anchor.web3.PublicKey> {
+    const [registrationPda] = await anchor.web3.PublicKey.findProgramAddress(
+      [
+        utf8.encode("registration"),
+        eventIndex.toArrayLike(Buffer, "be", 8),
+        registrationIndex.toArrayLike(Buffer, "be", 8),
+      ],
+      program.programId
+    );
+    return registrationPda;
+  }
 
-  describe("state", () => {
+  describe("create_state", () => {
     it("creates state successfully", async () => {
-      const [statePda] = await anchor.web3.PublicKey.findProgramAddress(
-        [utf8.encode("state")],
-        program.programId
-      );
+      const statePda = await getStatePda();
       try {
         // if not created, create state
         await program.methods
@@ -54,11 +80,8 @@ describe("devent unit tests", () => {
         });
       }
     });
-    it("state variables are valid", async () => {
-      const [statePda] = await anchor.web3.PublicKey.findProgramAddress(
-        [utf8.encode("state")],
-        program.programId
-      );
+    it("state variables types are valid", async () => {
+      const statePda = await getStatePda();
       const stateData = await program.account.stateAccount.fetch(statePda);
       assert(
         stateData.authority.equals(wallet.publicKey),
@@ -71,7 +94,8 @@ describe("devent unit tests", () => {
     });
   });
 
-  describe("event", () => {
+  /*
+  describe("create_event", () => {
     const title = "Milkshake, Ministry of Sound - The Official Return 2022";
     const organizer = "Milkshake";
     const description =
@@ -206,8 +230,50 @@ describe("devent unit tests", () => {
       console.log(events);
     });
   });
+  */
 
-  describe("registration", () => {
-    // it("registers PublicKey and transfers lamports", async () => {});
+  describe("create_registration", async () => {
+    const statePda = await getStatePda();
+    let stateData, eventPda, eventData;
+
+    // create_event arguments
+    const maxRegistration: anchor.BN = new anchor.BN("2");
+    const registrationPrice: anchor.BN = new anchor.BN("130000000");
+    const resellAllowed: boolean = true;
+    const maxResellPrice: anchor.BN = registrationPrice;
+    const mintNftOnRegistration: boolean = true;
+    const mintNftOnAttendance: boolean = true;
+    const paused: boolean = false;
+
+    beforeEach(async () => {
+      // create an event
+      stateData = await program.account.stateAccount.fetch(statePda);
+      eventPda = await getEventPda(stateData.eventCount);
+      await program.methods
+        .createEvent(
+          maxRegistration,
+          registrationPrice,
+          resellAllowed,
+          maxResellPrice,
+          mintNftOnRegistration,
+          mintNftOnAttendance,
+          paused
+        )
+        .accounts({
+          state: statePda,
+          event: eventPda,
+          organizer: wallet.publicKey,
+          systemProgram: anchor.web3.SystemProgram.programId,
+        })
+        .rpc();
+      eventData = await program.account.eventAccount.fetch(eventPda);
+    });
+
+    it("throws if event is paused", async () => {
+      // pause the event
+    });
+    it("registers PublicKey and transfers lamports", async () => {});
+    it("throws if organizer is incorrect", async () => {});
+    it("throws if event is full", async () => {});
   });
 });

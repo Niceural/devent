@@ -1,16 +1,13 @@
 [features]
 seeds = false
 skip-lint = false
-# [programs.localnet]
 [programs.devnet]
-devent = "8sLvi7QKCyEyc7VtSGvGU1Vwos5GwmJ8q9wSRcNHhWNS"
+devent = "59sCeP718NpdHv3Xj6kjgrmGNEt67BNXFcy5VUBUDhJE"
 
 [registry]
-# url = "https://api.apr.dev"
-url = "https://api.devnet.solana.com"
+url = "https://anchor.projectserum.com"
 
 [provider]
-# cluster = "localnet"
 cluster = "devnet"
 wallet = "/home/nic/.config/solana/id.json"
 

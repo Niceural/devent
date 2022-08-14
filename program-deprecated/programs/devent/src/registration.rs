@@ -3,7 +3,6 @@ use anchor_lang::system_program;
 use anchor_spl::token::{self, Token};
 use std::mem::size_of;
 use crate::event::EventAccount;
-use crate::error::Error;
 
 pub fn create_registration(
     ctx: Context<CreateRegistration>,
@@ -12,31 +11,23 @@ pub fn create_registration(
     let event = &mut ctx.accounts.event;
     let registration = &mut ctx.accounts.registration;
 
-    // check if the event is paused
-    if event.paused {
-        return Err(Error::EventPaused.into());
-    }
-    // check if there's some tickets left
-    if event.max_registration <= event.registration_count {
-        return Err(Error::MaxCapacity.into())
-    }
-
+    // transfer lamports
     let ix = anchor_lang::solana_program::system_instruction::transfer(
-        &ctx.accounts.authority.key(),
+        &ctx.accounts.attendee.key(),
         &ctx.accounts.organizer.key(),
         event.registration_price,
     );
     anchor_lang::solana_program::program::invoke(
         &ix,
         &[
-            ctx.accounts.authority.to_account_info(),
+            ctx.accounts.attendee.to_account_info(),
             ctx.accounts.organizer.to_account_info(),
         ],
     )?;
 
     // set RegistrationAccount data
-    registration.event = event.key();
-    registration.authority = ctx.accounts.authority.key();
+    registration.event = event.index;
+    registration.attendee = ctx.accounts.attendee.key();
     registration.status = Status::Registered;
     registration.index = event.registration_count;
     event.registration_count += 1;
@@ -44,14 +35,19 @@ pub fn create_registration(
     Ok(())
 }
 
+/*
 pub fn update_registration(
     ctx: Context<UpdateRegistration>,
     price: u64,
 ) -> Result<()> {
     // getting accounts
-    let event = &ctx.accounts.event;
+    // let event = &ctx.accounts.event;
     let registration = &mut ctx.accounts.registration;
 
+    // **ctx.accounts.buyer.try_borrow_mut_lamports()? -= price;
+    // **ctx.accounts.seller.try_borrow_mut_lamports()? += price;
+
+    /*
     // check that event is not paused
     if event.paused {
         return Err(Error::EventPaused.into());
@@ -68,6 +64,7 @@ pub fn update_registration(
     if registration.status != Status::Registered {
         return Err(Error::InvalidStatus.into());
     }
+    */
 
     // transfer lamports
     let ix = anchor_lang::solana_program::system_instruction::transfer(
@@ -88,6 +85,7 @@ pub fn update_registration(
 
     Ok(())
 }
+*/
 
 #[derive(Accounts)]
 pub struct CreateRegistration<'info> {
@@ -95,7 +93,8 @@ pub struct CreateRegistration<'info> {
     #[account(
         mut,
         seeds = [b"event".as_ref(), event.index.to_be_bytes().as_ref()],
-        bump
+        bump,
+        constraint = !event.paused || event.registration_count < event.max_registration,
     )]
     pub event: Account<'info, EventAccount>,
 
@@ -108,34 +107,34 @@ pub struct CreateRegistration<'info> {
             event.registration_count.to_be_bytes().as_ref()
         ],
         bump,
-        payer = authority,
-        space = RegistrationAccount::LEN,
+        payer = attendee,
+        space = size_of::<RegistrationAccount>() + 8,
     )]
     pub registration: Account<'info, RegistrationAccount>,
 
-    // Authority (signer who paid transaction fee)
+    // ticket purchaser (signer who paid transaction fee)
     #[account(mut)]
-    pub authority: Signer<'info>,
+    pub attendee: Signer<'info>,
 
     // event organizer who created the event
-    #[account(constraint = organizer.key == &event.authority)]
+    #[account(constraint = organizer.key == &event.organizer)]
     pub organizer: Signer<'info>,
 
-    /// CHECK: System program
-    pub system_program: UncheckedAccount<'info>,
+    pub system_program: Program<'info, System>,
 
     // Token program
-    #[account(constraint = token_program.key == &token::ID)]
-    pub token_program: Program<'info, Token>,
+    // #[account(constraint = token_program.key == &token::ID)]
+    // pub token_program: Program<'info, Token>,
 }
 
+/*
 #[derive(Accounts)]
 pub struct UpdateRegistration<'info> {
     // authenticate event account
     #[account(
+        mut,
         seeds = [b"event".as_ref(), event.index.to_be_bytes().as_ref()],
-        bump,
-        constraint = event.key() == registration.event,
+        bump
     )]
     pub event: Account<'info, EventAccount>,
 
@@ -145,38 +144,40 @@ pub struct UpdateRegistration<'info> {
         seeds = [
             b"registration".as_ref(),
             event.index.to_be_bytes().as_ref(),
-            event.registration_count.to_be_bytes().as_ref()
+            registration.index.to_be_bytes().as_ref()
         ],
         bump,
-        constraint = seller.key == &registration.authority,
     )]
     pub registration: Account<'info, RegistrationAccount>,
 
-    // ticket seller
-    pub seller: Signer<'info>,
-
     // ticket receiver
+    #[account(mut)]
     pub buyer: Signer<'info>,
 
-    /// CHECK: System program
-    pub system_program: UncheckedAccount<'info>,
+    // ticket seller
+    /// CHECK : 
+    #[account(mut)]
+    pub seller: AccountInfo<'info>,
+
+    pub system_program: Program<'info, System>,
 
     // Token program
-    #[account(constraint = token_program.key == &token::ID)]
-    pub token_program: Program<'info, Token>,
+    // #[account(constraint = token_program.key == &token::ID)]
+    // pub token_program: Program<'info, Token>,
 }
+*/
 
 #[account]
 pub struct RegistrationAccount {
-    pub event: Pubkey,
-    pub authority: Pubkey,
+    pub event: u64,
+    pub attendee: Pubkey,
     pub index: u64,
     pub status: Status,
 }
 
-impl RegistrationAccount {
-    const LEN: usize = 32 + 32 + 8 + size_of::<Status>() + 8;
-}
+// impl RegistrationAccount {
+//     const LEN: usize = 32 + 32 + 8 + size_of::<Status>() + 8;
+// }
 
 #[derive(Debug, Clone, AnchorSerialize, AnchorDeserialize, PartialEq)]
 pub enum Status {

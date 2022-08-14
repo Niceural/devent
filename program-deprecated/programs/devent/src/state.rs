@@ -9,7 +9,7 @@ use std::mem::size_of;
 pub fn create_state(
     ctx: Context<CreateState>,
 ) -> Result<()> {
-    // get state
+    // get accounts
     let state = &mut ctx.accounts.state;
 
     // assign to state variables
@@ -31,16 +31,15 @@ pub struct CreateState<'info> {
     )]
     pub state: Account<'info, StateAccount>,
 
-    // authority (signer who paid transaction fee)
+    // authority
     #[account(mut)]
     pub authority: Signer<'info>,
 
-    /// CHECK: System program
-    pub system_program: UncheckedAccount<'info>,
+    pub system_program: Program<'info, System>,
 
     // Token program
-    #[account(constraint = token_program.key == &token::ID)]
-    pub token_program: Program<'info, Token>,
+    // #[account(constraint = token_program.key == &token::ID)]
+    // pub token_program: Program<'info, Token>,
 }
 
 #[account]

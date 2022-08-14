@@ -30,7 +30,7 @@ pub fn create_event(
     state.event_count += 1; // increments variable used for event index
 
     // assign values to event
-    event.authority = ctx.accounts.authority.key();
+    event.organizer = ctx.accounts.organizer.key();
     event.max_registration = max_registration;
     event.registration_count = 0;
     event.registration_price = registration_price;
@@ -58,25 +58,24 @@ pub struct CreateEvent<'info> {
         init,
         seeds = [b"event".as_ref(), state.event_count.to_be_bytes().as_ref()],
         bump,
-        payer = authority,
+        payer = organizer,
         space = size_of::<EventAccount>() + 8,
     )]
     pub event: Account<'info, EventAccount>,
 
-    // authority (signer who pays transaction fee)
+    // organizer (signer who pays transaction fee)
     #[account(mut)]
-    pub authority: Signer<'info>,
+    pub organizer: Signer<'info>,
 
-    /// CHECK: System program
-    pub system_program: UncheckedAccount<'info>,
+    pub system_program: Program<'info, System>,
 
-    #[account(constraint = token_program.key == &token::ID)]
-    pub token_program: Program<'info, Token>,
+    // #[account(constraint = token_program.key == &token::ID)]
+    // pub token_program: Program<'info, Token>,
 }
 
 #[account]
 pub struct EventAccount {
-    pub authority: Pubkey, // event organizer
+    pub organizer: Pubkey, // event organizer
     pub index: u64, // given by the StateAccount
     pub max_registration: u64, // maximum number of Pubkeys allowed to register
     pub registration_count: u64, // amount of Pubkeys currently registered

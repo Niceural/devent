@@ -1,5 +1,4 @@
 import * as anchor from "@project-serum/anchor";
-import { assert } from "chai";
 import {
   PROGRAM_ID,
   PROGRAM_IDL,
@@ -28,22 +27,10 @@ async function main() {
   );
   // creating wallets
   const organizerWallet: anchor.Wallet = new anchor.Wallet(organizerKeypair);
-  const resellerWallet: anchor.Wallet = new anchor.Wallet(resellerKeypair);
-  const attendeeWallet: anchor.Wallet = new anchor.Wallet(attendeeKeypair);
   // creating providers
   const organizerProvider: anchor.AnchorProvider = new anchor.AnchorProvider(
     connection,
     organizerWallet,
-    anchor.AnchorProvider.defaultOptions()
-  );
-  const resellerProvider: anchor.AnchorProvider = new anchor.AnchorProvider(
-    connection,
-    resellerWallet,
-    anchor.AnchorProvider.defaultOptions()
-  );
-  const attendeeProvider: anchor.AnchorProvider = new anchor.AnchorProvider(
-    connection,
-    attendeeWallet,
     anchor.AnchorProvider.defaultOptions()
   );
   // initial SOL balances
@@ -58,22 +45,22 @@ async function main() {
   );
   console.log(
     `Organizer: ${lamportsToSol(organizerInitialBalance)} SOL, ${
-      organizerProvider.publicKey
+      organizerWallet.publicKey
     }`
   );
   console.log(
     `Reseller:  ${lamportsToSol(resellerInitialBalance)} SOL, ${
-      resellerProvider.publicKey
+      resellerKeypair.publicKey
     }`
   );
   console.log(
     `Attendee:  ${lamportsToSol(attendeeInitialBalance)} SOL, ${
-      attendeeProvider.publicKey
+      attendeeKeypair.publicKey
     }\n`
   );
 
   // get program instance
-  const program: anchor.Program<Devent> = new anchor.Program(
+  let program: anchor.Program<Devent> = new anchor.Program(
     PROGRAM_IDL,
     PROGRAM_ID,
     organizerProvider
@@ -81,29 +68,27 @@ async function main() {
 
   // get program state
   console.log("Getting program state...");
-  const [stateAccountAddress] = await anchor.web3.PublicKey.findProgramAddress(
+  const [statePda] = await anchor.web3.PublicKey.findProgramAddress(
     [utf8.encode("state")],
     program.programId
   );
-  console.log(`StateAccount address: ${stateAccountAddress}\n`);
-  const stateAccountData = await program.account.stateAccount.fetch(
-    stateAccountAddress
-  );
+  console.log(`State pda: ${statePda}\n`);
+  const stateAccountData = await program.account.stateAccount.fetch(statePda);
 
   // create event
   console.log("Creating event...");
   // getting event address
-  const [eventAccountAddress] = await anchor.web3.PublicKey.findProgramAddress(
+  const [eventPda] = await anchor.web3.PublicKey.findProgramAddress(
     [
       utf8.encode("event"),
       stateAccountData.eventCount.toArrayLike(Buffer, "be", 8),
     ],
     program.programId
   );
-  console.log(`EventAccount address: ${eventAccountAddress}`);
+  console.log(`EventAccount address: ${eventPda}`);
   // arguments
   const maxRegistration: anchor.BN = new anchor.BN("173");
-  const registrationPrice: anchor.BN = new anchor.BN("1300000000");
+  const registrationPrice: anchor.BN = new anchor.BN("130000000");
   const resellAllowed: boolean = true;
   const maxResellPrice: anchor.BN = registrationPrice;
   const mintNftOnRegistration: boolean = true;
@@ -121,11 +106,12 @@ async function main() {
       paused
     )
     .accounts({
-      state: stateAccountAddress,
-      event: eventAccountAddress,
-      authority: organizerProvider.publicKey,
+      state: statePda,
+      event: eventPda,
+      authority: organizerWallet.publicKey,
       ...DEFAULT_ACCOUNTS,
     })
+    .signers([organizerKeypair])
     .rpc();
   // confirm transaction
   let latestBlockHash = await organizerProvider.connection.getLatestBlockhash();
@@ -135,9 +121,7 @@ async function main() {
     signature: tx,
   });
   // get event account data
-  const eventAccountData = await program.account.eventAccount.fetch(
-    eventAccountAddress
-  );
+  const eventAccountData = await program.account.eventAccount.fetch(eventPda);
   console.log(
     `Event created by organizer with index ${eventAccountData.index}\n`
   );
@@ -145,23 +129,22 @@ async function main() {
   // purchase ticket
   console.log("Purchasing ticket...");
   // getting RegistrationAccount address
-  const [registrationAccountAddress] =
-    await anchor.web3.PublicKey.findProgramAddress(
-      [
-        utf8.encode("registration"),
-        eventAccountData.index.toArrayLike(Buffer, "be", 8),
-        eventAccountData.registrationCount.toArrayLike(Buffer, "be", 8),
-      ],
-      program.programId
-    );
-  console.log(`RegistrationAccount address: ${registrationAccountAddress}`);
+  const [registrationPda] = await anchor.web3.PublicKey.findProgramAddress(
+    [
+      utf8.encode("registration"),
+      eventAccountData.index.toArrayLike(Buffer, "be", 8),
+      eventAccountData.registrationCount.toArrayLike(Buffer, "be", 8),
+    ],
+    program.programId
+  );
+  console.log(`RegistrationAccount address: ${registrationPda}`);
   // send transaction
   tx = await program.methods
     .createRegistration()
     .accounts({
-      event: eventAccountAddress,
-      registration: registrationAccountAddress,
-      authority: resellerProvider.publicKey,
+      event: eventPda,
+      registration: registrationPda,
+      authority: resellerKeypair.publicKey,
       organizer: eventAccountData.authority,
       ...DEFAULT_ACCOUNTS,
     })
@@ -176,13 +159,13 @@ async function main() {
   });
   // get RegistrationAccount data
   const registrationAccountData =
-    await program.account.registrationAccount.fetch(registrationAccountAddress);
+    await program.account.registrationAccount.fetch(registrationPda);
   // getting balances after
   const organizerBalanceAfterRegistration = new anchor.BN(
-    await connection.getBalance(organizerProvider.publicKey)
+    await connection.getBalance(organizerWallet.publicKey)
   );
   const resellerBalanceAfterRegistration = new anchor.BN(
-    await connection.getBalance(resellerProvider.publicKey)
+    await connection.getBalance(resellerKeypair.publicKey)
   );
   console.log(
     `Ticket purchased successfully for ${lamportsToSol(registrationPrice)} SOL`
@@ -201,17 +184,21 @@ async function main() {
   // resell ticket
   console.log("Reselling ticket...");
   // send transaction
-  tx = await program.methods
-    .updateRegistration(registrationPrice)
-    .accounts({
-      event: eventAccountAddress,
-      registration: registrationAccountAddress,
-      buyer: attendeeProvider.publicKey,
-      seller: resellerProvider.publicKey,
-      ...DEFAULT_ACCOUNTS,
-    })
-    .signers([attendeeKeypair])
-    .rpc();
+  try {
+    tx = await program.methods
+      .updateRegistration(registrationPrice)
+      .accounts({
+        event: eventPda,
+        registration: registrationPda,
+        buyer: attendeeKeypair.publicKey,
+        seller: resellerKeypair.publicKey,
+        systemProgram: DEFAULT_ACCOUNTS.systemProgram,
+      })
+      .signers([attendeeKeypair])
+      .rpc();
+  } catch (error) {
+    console.log(error);
+  }
   // sign transaction
   latestBlockHash = await organizerProvider.connection.getLatestBlockhash();
   await organizerProvider.connection.confirmTransaction({
@@ -224,10 +211,10 @@ async function main() {
   );
   // getting balances after
   const resellerBalanceAfterResell = new anchor.BN(
-    await connection.getBalance(resellerProvider.publicKey)
+    await connection.getBalance(resellerKeypair.publicKey)
   );
   const attendeeBalanceAfterResell = new anchor.BN(
-    await connection.getBalance(attendeeProvider.publicKey)
+    await connection.getBalance(attendeeKeypair.publicKey)
   );
   console.log(
     `Reseller balance: before = ${lamportsToSol(
